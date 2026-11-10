@@ -1,6 +1,7 @@
 # tgx — custom Telegram desktop client with built-in WS proxy
 
 Status: draft for approval · Date: 2026-11-09 · Working name: `tgx` (final name TBD)
+UI design: [`2026-11-10-tgx-ui-design.md`](2026-11-10-tgx-ui-design.md), prototype and design system: [`docs/mockups/tgx-ui.html`](../mockups/tgx-ui.html)
 
 ## 1. Intent
 

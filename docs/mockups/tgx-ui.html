@@ -3,24 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>tgx prototype</title>
+<title>tgx — прототип и дизайн-система</title>
 <style>
-:root {
+:root, [data-theme="light"] {
   --bg:#e9e7e2; --win:#f7f6f3; --pane:#efede8; --rail:#e5e2dc; --chat:#f2f0ec;
-  --line:#d9d6cf; --text:#1d1d1b; --muted:#6b6a65; --faint:#9a988f; --sel:#e2e0da;
-  --in:#ffffff; --accent:#2f6f62; --accent-ink:#ffffff;
-  --ok:#2f7d4f; --warn:#b7791f; --bad:#b5402f;
-  --accent-soft:color-mix(in srgb, var(--accent) 14%, var(--win));
+  --line:#d9d6cf; --text:#1d1d1b; --muted:#62615c; --faint:#88867e; --sel:#e2e0da;
+  --in:#ffffff; --accent:var(--accent-l, #2f6f62); --accent-ink:#ffffff;
+  --ok:#27704a; --warn:#8a5a0c; --bad:#b5402f;
+  --accent-soft:color-mix(in srgb, var(--accent) 12%, var(--win));
   --out:color-mix(in srgb, var(--accent) 13%, var(--in));
   --shadow:0 8px 28px -8px rgba(0,0,0,.25);
   --msg:14px;
   --mono:"Cascadia Mono","Consolas",ui-monospace,monospace;
   --sans:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;
 }
-:root[data-theme="dark"] {
+[data-theme="dark"] {
   --bg:#0f100f; --win:#1a1b1a; --pane:#161716; --rail:#131413; --chat:#121312;
-  --line:#2b2d2b; --text:#e6e5e0; --muted:#9b9a94; --faint:#6c6b66; --sel:#262826;
-  --in:#222422; --accent-ink:#0e1a17;
+  --line:#2b2d2b; --text:#e6e5e0; --muted:#9b9a94; --faint:#787771; --sel:#262826;
+  --in:#222422; --accent:var(--accent-d, #6fb3a3); --accent-ink:#0e1a17;
   --ok:#6cc28b; --warn:#e0a64a; --bad:#e07a68;
   --accent-soft:color-mix(in srgb, var(--accent) 18%, var(--win));
   --out:color-mix(in srgb, var(--accent) 22%, var(--in));
@@ -90,11 +90,11 @@ a { color:var(--accent); }
 .citem.on .t1 .i, .citem.on .t2, .citem.on .t2 .pfx, .citem.on .t2 em, .citem.on .t2 .draft, .citem.on .ctm, .citem.on .acc { color:inherit; }
 .citem.on .t2 { opacity:.85; }
 .cr { display:grid; justify-items:end; gap:4px; align-self:stretch; padding:3px 0; }
-.ctm { font-size:12px; color:var(--faint); display:flex; gap:2px; align-items:center; white-space:nowrap; }
+.ctm { font-size:12px; color:var(--muted); display:flex; gap:2px; align-items:center; white-space:nowrap; }
 .ctm .chk { color:var(--accent); }
 .citem.on .ctm .chk { color:inherit; }
 .badge { min-width:20px; height:20px; padding:0 6px; border-radius:10px; background:var(--accent); color:var(--accent-ink); font-size:12px; font-weight:600; display:grid; place-items:center; }
-.badge.mut { background:var(--faint); color:var(--win); }
+.badge.mut { background:var(--muted); color:var(--win); }
 .citem.on .badge { background:var(--accent-ink); color:var(--accent); }
 .cr .pinI { width:14px; height:14px; color:var(--faint); }
 .citem.on .cr .pinI { color:inherit; }
@@ -113,7 +113,7 @@ a { color:var(--accent); }
 .who { cursor:pointer; line-height:1.25; min-width:0; }
 .who .wt { font-weight:600; display:flex; gap:5px; align-items:center; }
 .who .wt .i { width:14px; height:14px; color:var(--faint); }
-.who .ws { font-size:12.5px; color:var(--muted); white-space:nowrap; }
+.who .ws { font-size:13px; color:var(--muted); white-space:nowrap; }
 .tools { margin-left:auto; display:flex; gap:2px; align-items:center; }
 .tools input { border:1px solid var(--line); background:var(--pane); border-radius:6px; padding:5px 9px; width:180px; outline:none; }
 .ib { width:34px; height:34px; display:grid; place-items:center; border:0; background:transparent; border-radius:6px; color:var(--muted); flex:none; }
@@ -124,7 +124,7 @@ a { color:var(--accent); }
 
 .pinbar { display:flex; align-items:center; gap:10px; padding:6px 8px 6px 16px; border-bottom:1px solid var(--line); background:var(--win); font-size:13px; cursor:pointer; }
 .pinbar .pq { flex:1; border-left:2px solid var(--accent); padding-left:8px; min-width:0; }
-.pinbar .pq b { display:block; color:var(--accent); font-weight:600; font-size:12.5px; }
+.pinbar .pq b { display:block; color:var(--accent); font-weight:600; font-size:13px; }
 .pinbar .pq span { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 .hwrap { position:relative; min-height:0; }
@@ -161,16 +161,16 @@ a { color:var(--accent); }
 .row .bubble.bare { background:none; box-shadow:none; padding:0; }
 .bubble.pb { padding-bottom:20px; }
 .from { font-size:13px; font-weight:600; color:var(--c); margin-bottom:1px; }
-:root[data-theme="dark"] .from { color:color-mix(in srgb, var(--c) 55%, white); }
+[data-theme="dark"] .from { color:color-mix(in srgb, var(--c) 55%, white); }
 .fwd { font-size:13px; color:var(--accent); margin-bottom:2px; }
 .quote { border-left:2px solid var(--accent); padding:2px 8px; margin:2px 0 5px; font-size:13px; background:var(--accent-soft); border-radius:0 4px 4px 0; min-width:0; }
 .quote b { display:block; color:var(--accent); font-weight:600; }
 .quote span { display:block; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:420px; }
 .row.out .quote { background:color-mix(in srgb, var(--accent) 12%, transparent); }
 .txt code { white-space:nowrap; font-family:var(--mono); font-size:.9em; background:color-mix(in srgb, var(--text) 8%, transparent); padding:0 4px; border-radius:3px; }
-.meta { float:right; margin:7px 0 -5px 10px; font-size:11px; color:var(--faint); display:inline-flex; align-items:center; gap:3px; white-space:nowrap; font-variant-numeric:tabular-nums; user-select:none; }
+.meta { float:right; margin:7px 0 -5px 10px; font-size:11px; color:var(--muted); display:inline-flex; align-items:center; gap:3px; white-space:nowrap; font-variant-numeric:tabular-nums; user-select:none; }
 .meta .i { width:13px; height:13px; }
-.row.out .meta { color:color-mix(in srgb, var(--accent) 55%, var(--muted)); }
+.row.out .meta { color:color-mix(in srgb, var(--accent) 60%, var(--text)); }
 .meta.abs { position:absolute; right:10px; bottom:5px; float:none; margin:0; }
 .meta.over { position:absolute; right:8px; bottom:8px; float:none; margin:0; background:rgba(0,0,0,.45); color:#fff !important; padding:1px 7px; border-radius:9px; }
 .chk { width:16px; height:11px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
@@ -215,7 +215,7 @@ a { color:var(--accent); }
 .voice.unheard .vdot { display:inline-block; }
 .vspeed { border:0; background:var(--accent-soft); color:var(--accent); font-size:11px; font-weight:600; border-radius:8px; padding:0 6px; line-height:16px; }
 .vtr { border:0; width:36px; white-space:nowrap; padding:0; height:30px; border-radius:8px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:700; flex:none; align-self:center; }
-.vtext { font-size:13.5px; padding:7px 2px 0; }
+.vtext { font-size:13px; padding:7px 2px 0; }
 .circle { width:220px; height:220px; position:relative; cursor:pointer; transition:width .25s, height .25s; }
 .circle.playing { width:300px; height:300px; }
 .circle:not(.playing) .cring { opacity:0; }
@@ -273,7 +273,7 @@ a { color:var(--accent); }
 .rtime { font:13px var(--mono); }
 .rhint { color:var(--muted); font-size:13px; margin-left:auto; }
 .composer.recording > :not(.recbar):not(.recb):not(.pop) { display:none; }
-.composer.recording .recbar { display:flex; }
+.composer.recording .recbar { display:flex; padding-right:20px; }
 .composer.recording .recb { background:var(--accent); color:var(--accent-ink); transform:scale(1.35); box-shadow:0 0 0 8px color-mix(in srgb, var(--accent) 22%, transparent); transition:transform .15s; }
 .camprev { position:absolute; right:24px; bottom:16px; width:240px; height:240px; border-radius:50%; overflow:hidden; box-shadow:var(--shadow); border:3px solid var(--bad); z-index:3; }
 .camprev svg { width:100%; height:100%; animation:pan 5s ease-in-out infinite alternate; }
@@ -342,7 +342,7 @@ input:checked + .sw::after { left:17px; }
 .ditem .i { color:var(--muted); }
 label.ditem input { display:none; }
 label.ditem .sw { margin-left:auto; }
-.dfoot { padding:12px 20px; color:var(--faint); font-size:12px; border-top:1px solid var(--line); }
+.dfoot { padding:12px 20px; color:var(--muted); font-size:12px; border-top:1px solid var(--line); }
 
 .mwrap { position:absolute; inset:0; display:grid; place-items:center; background:rgba(0,0,0,.38); z-index:30; }
 .modal { width:470px; height:min(680px, calc(100% - 40px)); background:var(--win); border-radius:12px; display:grid; grid-template-rows:52px 1fr; overflow:hidden; box-shadow:var(--shadow); }
@@ -352,15 +352,15 @@ label.ditem .sw { margin-left:auto; }
 .sgroup { padding:6px 0; border-bottom:8px solid var(--pane); }
 .sgroup:last-child { border-bottom:0; }
 .sgroup h4 { margin:8px 18px 4px; font-size:13px; color:var(--accent); font-weight:600; }
-.snote { margin:4px 18px 8px; font-size:12.5px; color:var(--muted); }
+.snote { margin:4px 18px 8px; font-size:13px; color:var(--muted); }
 .srow { display:flex; align-items:center; gap:16px; width:100%; padding:10px 18px; border:0; background:none; text-align:left; font-size:14px; min-height:44px; }
 button.srow:hover, label.srow:hover { background:var(--sel); }
 label.srow { cursor:pointer; }
 .srow.static { cursor:default; }
 .srow > .i { color:var(--muted); }
 .srow .sl { flex:1; min-width:0; }
-.srow .sl small { display:block; color:var(--muted); font-size:12.5px; margin-top:1px; }
-.srow .sv { color:var(--accent); font-size:13.5px; white-space:nowrap; }
+.srow .sl small { display:block; color:var(--muted); font-size:13px; margin-top:1px; }
+.srow .sv { color:var(--accent); font-size:13px; white-space:nowrap; }
 .srow .chv { color:var(--faint); width:16px; height:16px; }
 .srow.danger, .srow.danger .i { color:var(--bad); }
 .srow.accent { color:var(--accent); font-weight:600; justify-content:center; }
@@ -380,7 +380,7 @@ label.srow { cursor:pointer; }
 .sfield input:focus, .sfield textarea:focus { border-color:var(--accent); }
 .sfield .pre { display:flex; align-items:center; gap:2px; }
 .sfield .pre span { color:var(--muted); font-size:15px; }
-.sfield .cnt { text-align:right; font-size:12px; color:var(--faint); }
+.sfield .cnt { text-align:right; font-size:12px; color:var(--muted); }
 .swatches { display:flex; gap:12px; padding:8px 18px 12px; }
 .sw8 { width:34px; height:34px; border-radius:50%; border:0; position:relative; }
 .sw8.on::after { content:""; position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--text); }
@@ -402,7 +402,7 @@ label.srow { cursor:pointer; }
 .about { display:grid; justify-items:center; gap:4px; padding:22px 18px 16px; text-align:center; }
 .mark { width:56px; height:56px; border-radius:12px; background:var(--text); color:var(--win); display:grid; place-items:center; font:600 18px var(--mono); }
 .about .an { font-weight:600; font-size:17px; margin-top:8px; }
-.about .av { color:var(--muted); font:12.5px var(--mono); }
+.about .av { color:var(--muted); font:13px var(--mono); }
 .callrow .i.missed { color:var(--bad); }
 .callrow .i.inc { color:var(--ok); }
 .ckb { width:18px; height:18px; accent-color:var(--accent); margin:0; }
@@ -411,7 +411,7 @@ label.srow input.ckb { display:block; }
 .viewer { position:absolute; inset:0; background:rgba(8,9,8,.94); z-index:40; display:grid; grid-template-rows:54px 1fr auto; color:#eee; }
 .vtop { display:flex; align-items:center; gap:12px; padding:0 10px 0 18px; }
 .vtop .vw { flex:1; line-height:1.25; }
-.vtop .vw span { display:block; font-size:12.5px; color:#aaa; }
+.vtop .vw span { display:block; font-size:13px; color:#aaa; }
 .vtop .ib { color:#ccc; }
 .vtop .ib:hover { background:rgba(255,255,255,.1); color:#fff; }
 .vstage { display:grid; place-items:center; min-height:0; padding:10px; }
@@ -444,7 +444,7 @@ label.srow input.ckb { display:block; }
 .lcard .mark { margin-bottom:22px; width:48px; height:48px; border-radius:10px; font-size:16px; }
 .lcard h2 { margin:0 0 6px; font-size:22px; font-weight:600; }
 .lcard p { margin:0 0 20px; color:var(--muted); }
-.steps { display:flex; gap:6px; margin-bottom:22px; font-size:12px; color:var(--faint); }
+.steps { display:flex; gap:6px; margin-bottom:22px; font-size:12px; color:var(--muted); }
 .steps span { flex:1; border-top:2px solid var(--line); padding-top:6px; }
 .steps span.on { border-color:var(--accent); color:var(--text); }
 .steps span.done { border-color:var(--accent); }
@@ -461,7 +461,7 @@ label.srow input.ckb { display:block; }
 .code input { width:54px; height:58px; text-align:center; font:600 24px var(--mono); border:1px solid var(--line); border-radius:8px; background:var(--win); outline:none; color:var(--text); }
 .code input:focus { border-color:var(--accent); }
 .qrbox { width:220px; height:220px; padding:12px; background:#fff; border-radius:10px; margin:6px auto 18px; border:1px solid var(--line); }
-.qrsteps { margin:0 0 4px; padding-left:20px; color:var(--muted); font-size:13.5px; line-height:1.7; }
+.qrsteps { margin:0 0 4px; padding-left:20px; color:var(--muted); font-size:13px; line-height:1.7; }
 .lroute { margin-top:30px; padding-top:14px; border-top:1px solid var(--line); font:12px var(--mono); color:var(--muted); }
 .shake { animation:shake .3s; }
 @keyframes shake { 25% { transform:translateX(-6px); } 75% { transform:translateX(6px); } }
@@ -481,14 +481,249 @@ label.srow input.ckb { display:block; }
 .tag { border:1px solid var(--line); padding:1px 6px; border-radius:3px; color:var(--text); }
 .tag.warn { border-color:var(--warn); color:var(--warn); }
 .status .r { margin-left:auto; }
+.status [data-st]:hover { color:var(--text); text-decoration:underline; }
+
+/* ---------- base additions ---------- */
+[data-theme] { color:var(--text); }
+[data-theme="light"] { color-scheme:light; }
+:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+input:focus-visible, textarea:focus-visible, select:focus-visible { outline:none; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
+kbd { font:11px var(--mono); color:var(--muted); border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:0 5px; background:var(--pane); white-space:nowrap; }
+.dot.acc { background:var(--accent); }
+
+/* page chrome: view switch and screen jump */
+.seg { display:flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--win); }
+.seg button { border:0; background:none; padding:4px 12px; font-size:13px; color:var(--muted); }
+.seg button.on { background:var(--text); color:var(--win); }
+select.pbtn { color:var(--text); max-width:230px; }
+body[data-view="ds"] .scroller, body[data-view="ds"] .only-proto { display:none; }
+body:not([data-view="ds"]) .ds, body:not([data-view="ds"]) .only-ds { display:none; }
+
+/* list head: search shortcut and offline banner */
+.lq { position:relative; }
+.lq input { padding-right:62px; }
+.lq kbd { position:absolute; right:7px; top:50%; transform:translateY(-50%); cursor:pointer; }
+.netban { display:flex; align-items:center; gap:8px; margin-top:8px; padding:5px 5px 5px 10px; border-radius:6px; font-size:12px; background:color-mix(in srgb, var(--bad) 10%, var(--pane)); border:1px solid color-mix(in srgb, var(--bad) 30%, var(--line)); }
+.netban span { flex:1; }
+
+/* compact density */
+.compact .app { grid-template-columns:52px 280px minmax(0,1fr) auto; }
+.compact .rbtn { padding:9px 0; }
+.compact .rbtn > span { display:none; }
+.compact .citem { padding:4px 10px; grid-template-columns:34px minmax(0,1fr) auto; }
+.compact .citem .ava { --s:34px !important; }
+.compact .t2 { font-size:12px; margin-top:0; }
+.compact .row.first { margin-top:4px; }
+.compact .bubble { padding:4px 9px 5px; border-radius:8px; }
+.compact .chead { height:46px; }
+.compact .conv { grid-template-rows:46px auto minmax(0,1fr) auto auto auto; }
+
+/* locally saved deleted messages, edit history, bookmarks */
+.row.gone .bubble { background:transparent; box-shadow:none; outline:1px dashed var(--faint); outline-offset:-1px; }
+.row.gone .txt { color:var(--muted); }
+.gone-l { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--bad); margin-bottom:2px; }
+.gone-l .i { width:13px; height:13px; }
+.meta .ed { border:0; background:none; padding:0; font:inherit; color:inherit; text-decoration:underline dotted; text-underline-offset:2px; }
+.meta .i.bm { color:var(--accent); }
+.ctx h5 { margin:5px 10px 3px; font-size:12px; font-weight:600; color:var(--muted); }
+.ctx .ver { padding:6px 10px; max-width:320px; font-size:13px; border-top:1px solid var(--line); }
+.ctx .ver small { display:block; font:11px var(--mono); color:var(--muted); margin-bottom:2px; }
+.inote { padding:6px 18px 12px; display:grid; gap:4px; font-size:12px; color:var(--muted); }
+.inote textarea { border:1px solid var(--line); background:var(--pane); border-radius:6px; padding:7px 9px; resize:none; outline:none; font-size:13px; color:var(--text); }
+.inote textarea:focus { border-color:var(--accent); }
+
+/* drawer: accounts */
+.dprof { position:relative; }
+.dacc-t { position:absolute; right:10px; bottom:10px; }
+.dacc-t.open .i { transform:rotate(180deg); }
+.daccs { border-bottom:1px solid var(--line); padding:4px 0; }
+.daccs .ditem { padding:7px 20px; gap:12px; }
+.daccs .ditem small { display:block; color:var(--muted); font-size:12px; }
+.daccs .ditem > :last-child:not(span) { margin-left:auto; }
+.daccs .ditem .i.cur { color:var(--accent); }
+.dsep { height:1px; background:var(--line); margin:6px 0; }
+
+/* settings pages: tabs, downloads, diagnostics, journal, hotkeys */
+.ptabs { display:flex; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--win); z-index:1; }
+.ptabs button { flex:1; border:0; background:none; padding:11px 0 9px; font-size:13px; color:var(--muted); border-bottom:2px solid transparent; }
+.ptabs button.on { color:var(--accent); border-bottom-color:var(--accent); font-weight:600; }
+.dl { display:grid; grid-template-columns:40px minmax(0,1fr) auto; gap:12px; padding:9px 10px 9px 18px; align-items:center; }
+.dl .fic { width:40px; height:40px; border-radius:8px; }
+.dl .dm { display:grid; gap:5px; min-width:0; }
+.dl .dn { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dl .dsub { font:12px var(--mono); color:var(--muted); display:flex; gap:10px; white-space:nowrap; overflow:hidden; }
+.dl .dsub .err { color:var(--bad); }
+.dl .dact { display:flex; }
+.prog { height:4px; border-radius:2px; background:var(--sel); overflow:hidden; }
+.prog i { display:block; height:100%; width:calc(var(--p) * 1%); background:var(--accent); transition:width .4s linear; }
+.dl.paused .prog i, .dl.queued .prog i { background:var(--faint); }
+.dl.error .prog i { background:var(--bad); }
+.diag { padding:16px 18px 0; display:grid; grid-template-columns:auto minmax(0,1fr); gap:6px 18px; align-items:end; }
+.diag .big { font:600 34px/1 var(--mono); letter-spacing:-.02em; }
+.diag .big small { font-size:14px; font-weight:400; color:var(--muted); margin-left:4px; }
+.diag .rt { font:12px var(--mono); color:var(--muted); grid-column:1 / -1; }
+.spark { height:44px; width:100%; display:block; }
+.spark path { fill:none; stroke:var(--accent); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+.spark path.ar { fill:color-mix(in srgb, var(--accent) 12%, transparent); stroke:none; }
+.stats { display:grid; grid-template-columns:repeat(4, 1fr); border-top:1px solid var(--line); margin-top:12px; }
+.stats div { padding:9px 0 9px 18px; border-right:1px solid var(--line); font-size:12px; color:var(--muted); }
+.stats div:last-child { border-right:0; }
+.stats b { display:block; font:500 14px var(--mono); color:var(--text); margin-bottom:1px; }
+.dct { width:100%; border-collapse:collapse; font:12px var(--mono); color:var(--muted); }
+.dct td { padding:6px 0; white-space:nowrap; }
+.dct td:first-child { padding-left:18px; width:104px; color:var(--text); }
+.dct td:last-child { padding-right:18px; text-align:right; width:92px; }
+.dct tr.cur td:first-child { color:var(--accent); font-weight:600; }
+.dct .bar { height:4px; border-radius:2px; background:var(--sel); position:relative; margin:0 12px; min-width:120px; }
+.dct .bar i { position:absolute; inset:0 auto 0 0; width:calc(var(--w) * 1%); border-radius:2px; background:var(--ok); }
+.dct tr.warn .bar i { background:var(--warn); }
+.dct tr.bad .bar i { background:var(--bad); width:100%; opacity:.3; }
+.dct tr.warn td:last-child { color:var(--warn); }
+.dct tr.bad td:last-child { color:var(--bad); }
+.log { margin:0; padding:2px 18px 10px; list-style:none; font:12px/1.5 var(--mono); color:var(--muted); }
+.log li { display:grid; grid-template-columns:66px 14px minmax(0,1fr); padding:3px 0; }
+.log li b { font-weight:400; color:var(--text); }
+.log .dot { margin:6px 0 0; }
+.jr { display:grid; grid-template-columns:36px minmax(0,1fr) auto; gap:12px; padding:10px 10px 10px 18px; align-items:start; border-bottom:1px solid var(--line); }
+.jr:last-child { border-bottom:0; }
+.jr .jh { font-size:13px; font-weight:600; }
+.jr .jh span { font-weight:400; color:var(--muted); }
+.jr .jt { overflow-wrap:anywhere; }
+.jr .jm { font:11px var(--mono); color:var(--muted); margin-top:3px; }
+.jr del { color:var(--muted); text-decoration-color:var(--bad); }
+.jr ins { text-decoration:none; background:var(--accent-soft); border-radius:2px; padding:0 2px; }
+.keys { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 18px; }
+.keys span:last-child { display:flex; gap:4px; flex:none; }
+.pcset { padding:6px 18px 14px; }
+.pcset .code input { width:48px; height:52px; font-size:20px; }
+
+/* global search */
+.spw { position:absolute; inset:0; z-index:32; background:rgba(0,0,0,.38); display:flex; justify-content:center; align-items:flex-start; padding:56px 20px 30px; }
+.sp { width:720px; max-width:100%; max-height:100%; background:var(--win); border-radius:12px; box-shadow:var(--shadow); display:grid; grid-template-rows:auto auto minmax(0,1fr) auto; overflow:hidden; }
+.sp-in { display:flex; align-items:center; gap:10px; padding:0 12px 0 16px; height:52px; border-bottom:1px solid var(--line); color:var(--muted); }
+.sp-in input { flex:1; min-width:0; border:0; outline:none; background:none; font-size:16px; color:var(--text); }
+.sp-in input.re { font-family:var(--mono); font-size:14px; }
+.sp-re { border:1px solid var(--line); background:none; border-radius:6px; height:28px; padding:0 8px; font:12px var(--mono); color:var(--muted); }
+.sp-re.on { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+.sp-f { display:flex; gap:6px; align-items:center; padding:8px 14px; border-bottom:1px solid var(--line); }
+.chip { border:1px solid var(--line); background:none; border-radius:13px; padding:0 11px; font-size:13px; color:var(--muted); height:26px; }
+.chip:hover { color:var(--text); border-color:var(--faint); }
+.chip.on { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); font-weight:600; }
+.sp-f select { margin-left:auto; min-width:0; width:150px; text-overflow:ellipsis; border:1px solid var(--line); background:var(--win); border-radius:6px; padding:3px 6px; font-size:13px; color:var(--text); }
+.sp-res { overflow-y:auto; min-height:140px; }
+.sp-row { display:grid; grid-template-columns:36px minmax(0,1fr) auto; gap:12px; padding:7px 14px; align-items:center; cursor:default; }
+.sp-row.sel, .sp-row:hover { background:var(--sel); }
+.sp-row .t1 small { font-weight:400; color:var(--muted); font-size:13px; margin-left:4px; }
+.sp-row .when { font:11px var(--mono); color:var(--muted); }
+.sp-none { padding:34px 20px; text-align:center; color:var(--muted); }
+.sp-none.err { color:var(--bad); font:13px var(--mono); }
+.sp-foot { display:flex; gap:14px; padding:7px 14px; border-top:1px solid var(--line); background:var(--pane); font:12px var(--mono); color:var(--muted); white-space:nowrap; }
+.sp-foot .r { margin-left:auto; }
+
+/* lock screen */
+.lock { position:absolute; inset:0; z-index:70; background:var(--win); display:grid; place-items:center; }
+.lock .lcard { width:300px; text-align:center; }
+.lock .mark { margin:0 auto 22px; }
+.pins { display:flex; gap:10px; justify-content:center; margin:18px 0 6px; }
+.pins input { width:46px; height:52px; text-align:center; font:600 22px var(--mono); border:1px solid var(--line); border-radius:8px; background:var(--win); outline:none; color:var(--text); }
+.pins input:focus { border-color:var(--accent); }
+
+/* call */
+.call { position:absolute; right:16px; top:16px; z-index:44; width:320px; border-radius:14px; background:var(--win); border:1px solid var(--line); box-shadow:var(--shadow); display:grid; justify-items:center; padding:8px 12px 20px; }
+.call-top { display:flex; align-items:center; width:100%; gap:6px; font:11px var(--mono); color:var(--muted); padding-left:6px; white-space:nowrap; }
+.call-top .ib { margin-left:auto; }
+.call-ava { position:relative; margin:20px 0 14px; }
+.call.ringing .call-ava::before { content:""; position:absolute; inset:-8px; border-radius:50%; border:2px solid var(--accent); animation:ring 1.6s ease-out infinite; }
+@keyframes ring { from { transform:scale(.9); opacity:.9; } to { transform:scale(1.25); opacity:0; } }
+.call-n { font-size:18px; font-weight:600; }
+.call-s { font:13px var(--mono); color:var(--muted); margin-top:3px; min-height:18px; }
+.call-key { margin-top:14px; font-size:20px; letter-spacing:4px; text-align:center; }
+.call-key small { display:block; font:11px var(--sans); letter-spacing:0; color:var(--muted); margin-top:2px; }
+.call-ctl { display:flex; gap:12px; margin-top:20px; }
+.cbtn { width:48px; height:48px; border-radius:50%; border:0; background:var(--sel); color:var(--text); display:grid; place-items:center; }
+.cbtn:hover { filter:brightness(1.2); }
+.cbtn.on { background:var(--text); color:var(--win); }
+.cbtn.end { background:var(--bad); color:var(--win); }
+.cbtn.end .i { transform:rotate(135deg); }
+.cbtn.take { background:var(--ok); color:var(--win); }
+.cbtn .i { width:20px; height:20px; }
+.callpill { position:absolute; left:50%; top:10px; transform:translateX(-50%); z-index:44; display:flex; align-items:center; gap:10px; background:var(--accent); color:var(--accent-ink); border:0; border-radius:16px; padding:5px 14px; font-size:13px; font-weight:600; box-shadow:var(--shadow); }
+.callpill span { font:12px var(--mono); }
+
+/* ---------- design system view ---------- */
+.ds { flex:1; min-height:0; overflow:auto; scroll-behavior:smooth; }
+.ds-in { max-width:1180px; margin:0 auto; display:grid; grid-template-columns:180px minmax(0,1fr); gap:44px; padding:6px 0 80px; }
+.ds-nav { position:sticky; top:6px; align-self:start; display:grid; gap:1px; font-size:13px; }
+.ds-nav a { color:var(--muted); text-decoration:none; padding:5px 10px; border-radius:6px; }
+.ds-nav a:hover { background:var(--sel); color:var(--text); }
+.ds-sec { padding:30px 0 10px; border-top:1px solid var(--line); }
+.ds-sec:first-child { border-top:0; padding-top:8px; }
+.ds-sec h2 { font:600 24px/1.2 "Segoe UI Variable Display","Segoe UI",system-ui,sans-serif; letter-spacing:-.01em; margin:0 0 6px; }
+.ds-sec > p { color:var(--muted); max-width:70ch; margin:0 0 16px; }
+.ds-sec h3 { font-size:14px; font-weight:600; margin:24px 0 10px; }
+.ds-sec h2.ds-lead { font-size:34px; line-height:1.15; letter-spacing:-.02em; margin:0 0 10px; max-width:30ch; }
+.prin { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:18px 40px; margin:22px 0 4px; padding:0; list-style:none; max-width:900px; }
+.prin b { display:block; margin-bottom:2px; }
+.prin li { color:var(--muted); }
+.prin li b { color:var(--text); }
+.spec { border:1px solid var(--line); border-radius:8px; background:var(--win); overflow:hidden; min-width:0; }
+.spec-b { padding:16px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; position:relative; }
+.spec-b.col { display:block; padding:0; }
+.spec-b.chatbg { background:var(--chat); display:block; padding:8px 0 12px; }
+.spec-b.panebg { background:var(--pane); display:block; padding:0; }
+.spec-c { border-top:1px solid var(--line); padding:7px 12px; font:12px/1.5 var(--mono); color:var(--muted); background:var(--pane); }
+.spec .status { cursor:default; height:26px; border-top:0; }
+.spec .ctx, .spec .wtoast, .spec .toast, .spec .pop { position:static; transform:none; opacity:1; animation:none; }
+.spec .call, .spec .lock, .spec .sp { position:relative; inset:auto; right:auto; top:auto; }
+.spec .lock { height:340px; width:100%; }
+.grid2 { display:grid; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); gap:14px; align-items:start; }
+.grid1 { display:grid; gap:14px; }
+.grid3 { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:14px; align-items:start; }
+table.tk { width:100%; border-collapse:collapse; font-size:13px; }
+table.tk th { text-align:left; font-weight:500; font-size:12px; color:var(--muted); padding:0 12px 6px 0; border-bottom:1px solid var(--line); white-space:nowrap; }
+table.tk td { padding:7px 12px 7px 0; border-bottom:1px solid var(--line); vertical-align:middle; }
+table.tk code { font:12px var(--mono); }
+table.tk td.num { font:12px var(--mono); white-space:nowrap; }
+.swt { width:26px; height:26px; border-radius:6px; border:1px solid var(--line); display:inline-block; vertical-align:middle; margin-right:8px; }
+.pass { font:11px var(--mono); padding:1px 6px; border-radius:3px; border:1px solid var(--ok); color:var(--ok); }
+.pass.mid { border-color:var(--warn); color:var(--warn); }
+.pass.no { border-color:var(--line); color:var(--muted); }
+.icons { display:grid; grid-template-columns:repeat(auto-fill, minmax(92px, 1fr)); gap:2px; }
+.icons div { display:grid; justify-items:center; gap:6px; padding:12px 4px 8px; font:11px var(--mono); color:var(--muted); border-radius:6px; }
+.icons div:hover { background:var(--sel); color:var(--text); }
+.icons .i { width:22px; height:22px; color:var(--text); }
+.anat { display:grid; grid-template-columns:68fr 310fr 500fr 320fr; grid-template-rows:26px 250px 24px; border:1px solid var(--line); border-radius:8px; overflow:hidden; font:12px/1.4 var(--mono); color:var(--muted); background:var(--win); }
+.anat > div { display:grid; place-content:center; text-align:center; border-right:1px solid var(--line); padding:4px; min-width:0; }
+.anat > div:nth-child(5) { border-right:0; }
+.anat .a-t, .anat .a-s { grid-column:1 / -1; border-right:0; }
+.anat .a-t { border-bottom:1px solid var(--line); }
+.anat .a-s { border-top:1px solid var(--line); background:var(--pane); }
+.anat .a-rail { background:var(--rail); }
+.anat .a-list { background:var(--pane); }
+.anat .a-conv { background:var(--chat); }
+.anat b { display:block; color:var(--text); font-weight:500; }
+.scale { display:flex; gap:18px; align-items:flex-end; flex-wrap:wrap; font:11px var(--mono); color:var(--muted); text-align:center; }
+.scale i { display:block; background:var(--accent); margin:0 auto 6px; }
+.scale .rad i { width:44px; height:44px; background:var(--accent-soft); border:1px solid var(--accent); }
+.tsample { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:420px; }
+.skel { display:grid; grid-template-columns:46px 1fr; gap:10px; padding:7px 10px; align-items:center; }
+.skel i { display:block; border-radius:6px; background:var(--sel); height:10px; }
+.skel i.av { width:46px; height:46px; border-radius:50%; }
+.skel span { display:grid; gap:8px; }
+.mapbtn { border:0; background:none; color:var(--accent); padding:0; font-size:13px; text-decoration:underline; text-underline-offset:2px; }
+@media (max-width:860px) { .ds-in { grid-template-columns:minmax(0,1fr); } .ds-nav { display:none; } .prin { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
 
 <header class="page-head">
-  <h1>tgx — интерактивный макет</h1>
-  <p>Всё кликается. ПКМ по сообщению или чату — меню, кнопку микрофона удерживайте для записи (короткое нажатие — кружок), ☰ — меню и настройки. Данные вымышленные.</p>
-  <button class="pbtn" id="toLogin">Экран входа</button>
+  <h1>tgx</h1>
+  <div class="seg" id="viewseg"><button data-view="proto" class="on">Прототип</button><button data-view="ds">Дизайн-система</button></div>
+  <p class="only-proto">Всё кликается: ПКМ по сообщению или чату, Ctrl+K — поиск, ☰ — меню и настройки. Данные вымышленные.</p>
+  <p class="only-ds">Токены, компоненты и карта экранов. Образцы собраны теми же функциями, что и прототип.</p>
+  <select class="pbtn only-proto" id="jump" aria-label="Перейти к экрану"></select>
+  <button class="pbtn" id="themeT">Тема</button>
   <button class="pbtn" id="reset">Сбросить</button>
 </header>
 
@@ -500,7 +735,7 @@ label.srow input.ckb { display:block; }
   <div class="stage">
     <div class="app" id="app">
       <nav class="rail" id="rail"></nav>
-      <aside class="list"><div class="lhead"><input id="q" placeholder="Поиск" autocomplete="off"></div><div class="chats" id="chats"></div></aside>
+      <aside class="list"><div class="lhead"><div class="lq"><input id="q" placeholder="Поиск" autocomplete="off"><kbd id="qk" title="Поиск по всей истории">Ctrl K</kbd></div><div id="netban"></div></div><div class="chats" id="chats"></div></aside>
       <main class="conv">
         <header class="chead" id="chead"></header>
         <div id="pinbar"></div>
@@ -516,12 +751,16 @@ label.srow input.ckb { display:block; }
     <div class="mwrap" id="mwrap" hidden><div class="modal"><header class="mhead"><button class="ib" id="mback"></button><h3 id="mtitle"></h3><button class="ib" id="mclose"></button></header><div class="mbody" id="mbody"></div></div></div>
     <div class="viewer" id="viewer" hidden></div>
     <div class="login" id="login" hidden></div>
+    <div class="spw" id="spw" hidden></div>
+    <div id="callbox"></div>
+    <div class="lock" id="lock" hidden></div>
     <div class="wtoast" id="wtoast" hidden></div>
     <div class="toast" id="toast"></div>
   </div>
   <footer class="status" id="status" title="Открыть настройки подключения"></footer>
 </div>
 </div>
+<div class="ds" id="ds"></div>
 <div class="ctx" id="ctx" hidden></div>
 
 <script>
@@ -666,6 +905,7 @@ const CH = [
     T("Оля Смирнова", "Всем привет. Сборка с новым кешем аватарок готова, лежит на стенде", "14:02"),
     T("Оля Смирнова", "Холодный старт у меня 1.1 с, было 1.9", "14:02"),
     T("Игорь Дегтярёв", "А память после двух минут простоя сколько?", "14:06"),
+    T("Игорь Дегтярёв", "Поправка: на стенде пока старая сборка, не смотрите", "14:07", { deleted: "14:11" }),
     O("Мерил на своём аккаунте: 94 МБ private working set. Десктоп на том же аккаунте — 310", "14:09"),
     T("Оля Смирнова", "Вот так выглядит за две минуты", "14:21", { kind: "chart", reactions: [{ e: "🔥", n: 3, me: true }, { e: "👀", n: 1 }] }),
     T("Игорь Дегтярёв", "", "14:23", { kind: "voice", dur: 19, seed: 11, heard: false, tr: "Слушай, а если WS на медиа-DC отвалится, мы всю цепочку переключаем или только этот DC? Мне кажется, лучше всю, иначе непонятно, что видит провайдер." }),
@@ -683,7 +923,7 @@ const CH = [
     O("", "13:44", { kind: "sticker", st: 0 }),
     { unreadSep: true },
     T(null, "ок, тогда в четверг после обеда", "14:05", { reply: { from: "Вы", text: "Голосовое сообщение" } }),
-    T(null, "адрес скину ближе к делу", "14:05", { edited: true })
+    T(null, "адрес скину ближе к делу", "14:05", { edited: true, edits: [["14:05", "адрес скину завтра утром"], ["14:06", "адрес скину ближе к делу"]] })
   ] },
   { id: "mom", type: "private", title: "Мама", col: "#7d5a7a", last: "была недавно", unread: 1, phone: "+7 903 •••-••-07", msgs: [
     D("8 ноября"),
@@ -771,9 +1011,14 @@ const S = {
   priv: { phone: "contacts", lastseen: "nobody", photo: "all", fwd: "contacts", calls: "contacts", voice: "all", invites: "contacts" },
   store: [["Фото", 412, "var(--accent)"], ["Видео", 655, "#c08a4a"], ["Файлы", 96, "#5a6b8c"], ["Голосовые", 18, "#9a5b4f"], ["Прочее", 31, "var(--faint)"]],
   sessions: [["Telegram Android 11.x", "Pixel 7, Android 15", "Москва · вчера в 22:14"], ["Telegram Web K", "Firefox, Linux", "Москва · 3 ноября"]],
-  deletedCount: 37
+  deletedCount: 37,
+  compact: false, pass: "", autoLock: "5", hello: false,
+  acc: 0, accounts: [{ name: "denfry", username: "denfry", phone: "+7 916 •••-••-12" }, { name: "Работа", username: "denfry_work", phone: "+7 903 •••-••-55", unread: 3 }],
+  dlParallel: "2", dlLimit: "0", doh: true, frag: false, sni: "",
+  expFormat: "html", expText: true, expPhoto: true, expFiles: false, expPeriod: "all", expSched: "off",
+  autoReply: false, autoReplyText: "Сейчас не в сети, отвечу позже.", autoReplyWhen: "offline", aiTranslate: false, aiSummary: false
 };
-const state = { chat: "work", folder: "all", q: "", reply: null, recMode: "voice", conn: "connecting", info: false, itab: "media", loggedIn: true, csearch: false };
+const state = { chat: "work", folder: "all", q: "", reply: null, recMode: "voice", conn: "connecting", info: false, itab: "media", loggedIn: true, csearch: false, jtab: "deleted", accOpen: false, locked: false };
 const cur = () => CH.find(c => c.id === state.chat);
 const chatOf = id => CH.find(c => c.id === id);
 function msgById(c, id) { return c.msgs.find(m => m.id === id); }
@@ -861,14 +1106,15 @@ function previewHTML(c) {
   const k = kindLabel(m), t = (m.text || "").replace(/\*\*|`/g, "").split("\n")[0];
   return `<span class="pfx">${esc(pfx)}</span>${k ? `<em>${esc(k)}</em>${t ? ", " : ""}` : ""}${esc(t)}`;
 }
+function citemHTML(c, on) {
+  const m = lastReal(c);
+  const right = c.unread ? `<span class="badge ${c.muted ? "mut" : ""}">${c.unread > 999 ? "999+" : c.unread}</span>` : c.pin ? ic("pin", "pinI") : "";
+  return `<div class="citem ${on ? "on" : ""}" data-id="${c.id}">${avaHTML(c)}<div class="cmid"><div class="t1"><span class="tt">${esc(c.title)}</span>${c.muted ? ic("mute") : ""}</div><div class="t2">${previewHTML(c)}</div></div><div class="cr"><span class="ctm">${m && m.out && c.type !== "saved" && c.type !== "channel" ? checks(m.read) : ""}${listTime(c)}</span>${right}</div></div>`;
+}
 function renderList() {
   const q = state.q.trim().toLowerCase();
   const list = sorted().filter(c => inFolder(c, state.folder) && (!q || c.title.toLowerCase().includes(q)));
-  let h = list.map(c => {
-    const m = lastReal(c);
-    const right = c.unread ? `<span class="badge ${c.muted ? "mut" : ""}">${c.unread > 999 ? "999+" : c.unread}</span>` : c.pin ? ic("pin", "pinI") : "";
-    return `<div class="citem ${c.id === state.chat ? "on" : ""}" data-id="${c.id}">${avaHTML(c)}<div class="cmid"><div class="t1"><span class="tt">${esc(c.title)}</span>${c.muted ? ic("mute") : ""}</div><div class="t2">${previewHTML(c)}</div></div><div class="cr"><span class="ctm">${m && m.out && c.type !== "saved" && c.type !== "channel" ? checks(m.read) : ""}${listTime(c)}</span>${right}</div></div>`;
-  }).join("");
+  let h = list.map(c => citemHTML(c, c.id === state.chat)).join("");
   if (q) {
     const hits = [];
     CH.forEach(c => c.msgs.forEach(m => { if (isReal(m) && (m.text || "").toLowerCase().includes(q)) hits.push([c, m]); }));
@@ -906,9 +1152,10 @@ $("#q").addEventListener("input", e => { state.q = e.target.value; renderList();
 function meta(m, c, mode = "") {
   let s = "";
   if (c.type === "channel" && m.views) s += `${ic("eye")}${m.views}&nbsp;&nbsp;`;
-  if (m.edited) s += "изм. ";
+  if (m.bm) s += ic("bookmark", "bm");
+  if (m.edited) s += m.edits ? `<button class="ed" data-ed title="История правок">изм.</button> ` : "изм. ";
   s += m.t;
-  if (m.out && c.type !== "saved" && c.type !== "channel") s += checks(m.read);
+  if (m.out && c.type !== "saved" && c.type !== "channel") s += m.pending ? ic("clock") : checks(m.read);
   return `<span class="meta ${mode}">${s}</span>`;
 }
 const reactsHTML = m => m.reactions && m.reactions.length ? `<div class="reacts">${m.reactions.map(r => `<button class="rc ${r.me ? "me" : ""}" data-e="${r.e}">${r.e}<b>${r.n}</b></button>`).join("")}</div>` : "";
@@ -951,6 +1198,7 @@ function rowHTML(m, c, pos) {
   const groupIn = c.type === "group" && !m.out, post = c.type === "channel";
   let head = "";
   if (groupIn && pos.first && !bare) head += `<div class="from" style="--c:${colOf(m.from)}">${esc(m.from)}</div>`;
+  if (m.deleted) head += `<div class="gone-l">${ic("trash")}удалено в ${m.deleted}, копия сохранена локально</div>`;
   if (m.fwd) head += `<div class="fwd">Переслано от <b>${esc(m.fwd)}</b></div>`;
   if (m.reply) head += `<div class="quote"><b>${esc(m.reply.from)}</b><span>${esc(m.reply.text)}</span></div>`;
   let body = "", cls = "";
@@ -970,7 +1218,7 @@ function rowHTML(m, c, pos) {
   else if (k === "sticker") { cls = "bare"; body = `<div class="stk">${STICKERS[m.st || 0]}${meta(m, c, "over")}</div>`; }
   const kb = m.kb ? `<div class="kb">${m.kb.map(r => `<div class="kbrow">${r.map(b => `<button class="kbb">${esc(b)}</button>`).join("")}</div>`).join("")}</div>` : "";
   const left = groupIn ? `<div class="mava">${pos.last ? avaName(m.from, 34) : ""}</div>` : "";
-  return `<div class="row ${m.out ? "out" : "in"} ${pos.first ? "first" : ""} ${post ? "post" : ""}" data-id="${m.id}">${left}<div class="mcol"><div class="bubble ${cls}">${body}</div>${kb}</div></div>`;
+  return `<div class="row ${m.out ? "out" : "in"} ${pos.first ? "first" : ""} ${post ? "post" : ""} ${m.deleted ? "gone" : ""}" data-id="${m.id}">${left}<div class="mcol"><div class="bubble ${cls}">${body}</div>${kb}</div></div>`;
 }
 function histHTML(c) {
   const ms = c.msgs; let out = "";
@@ -1056,7 +1304,7 @@ document.querySelector(".conv").addEventListener("click", e => {
   const a = e.target.closest("[data-act]"); if (!a || !a.closest(".chead, #pinbar")) return;
   const c = cur(), act = a.dataset.act;
   if (act === "info") { state.info = !state.info; renderInfo(); }
-  else if (act === "call") toast("Звонки появятся в M6");
+  else if (act === "call") startCall(c, "out");
   else if (act === "csearch") { state.csearch = !state.csearch; renderHeader(); if (!state.csearch) filterHist(""); }
   else if (act === "unpin") { e.stopPropagation(); c.pinnedMsg = null; renderHeader(); }
   else if (act === "gopin") { const m = c.msgs.find(x => isReal(x) && plainOf(x) === c.pinnedMsg); if (m) { const r = $(`.row[data-id="${m.id}"]`, hist); r && (r.scrollIntoView({ block: "center" }), r.classList.remove("flash"), void r.offsetWidth, r.classList.add("flash")); } else toast("Сообщение выше в истории — в макете не загружено"); }
@@ -1066,7 +1314,7 @@ document.querySelector(".conv").addEventListener("click", e => {
       [c.muted ? "bell" : "mute", c.muted ? "Включить уведомления" : "Отключить уведомления", () => { c.muted = !c.muted; renderAll("keep"); }],
       ["info", "Информация", () => { state.info = true; renderInfo(); }],
       ["search", "Поиск в чате", () => { state.csearch = true; renderHeader(); }],
-      ["download", "Экспорт чата — M4", null, false, true],
+      ["download", "Экспорт чата", () => openSettings("export")],
       ["trash", "Очистить историю", () => { c.msgs = []; renderAll(); toast(S.keepDeleted ? "История очищена. Копия осталась в локальной базе" : "История очищена"); }, true]
     ] });
   }
@@ -1105,6 +1353,7 @@ hist.addEventListener("click", e => {
   const row = e.target.closest(".row"); if (!row) return;
   const c = cur(), m = msgById(c, +row.dataset.id); if (!m) return;
   const t = e.target;
+  if (t.closest("[data-ed]")) { showEdits(m, t.closest("[data-ed]")); return; }
   if (t.closest(".vplay")) toggleMedia($(".voice", row), m);
   else if (t.closest(".vspeed")) { const v = $(".voice", row), sp = { 1: 1.5, 1.5: 2, 2: 1 }[v.dataset.speed]; v.dataset.speed = sp; t.closest(".vspeed").textContent = sp + "×"; }
   else if (t.closest(".wave")) { const v = $(".voice", row), w = t.closest(".wave").getBoundingClientRect(); v.dataset.pos = (e.clientX - w.left) / w.width * v.dataset.dur; progress(v, +v.dataset.pos); if (!playing || playing.el !== v) toggleMedia(v, m); }
@@ -1157,9 +1406,10 @@ hist.addEventListener("contextmenu", e => {
     push(chatOf("saved"), copy); toast("Переслано в Избранное");
   }]);
   items.push(["pin", "Закрепить", () => { c.pinnedMsg = plainOf(m); renderHeader(); toast("Сообщение закреплено"); }]);
+  items.push(["bookmark", m.bm ? "Убрать из закладок" : "В закладки", () => { m.bm = !m.bm; renderConv("keep"); restoreScroll(); toast(m.bm ? "Добавлено в закладки" : "Убрано из закладок"); }]);
   items.push(["trash", "Удалить", () => {
     c.msgs.splice(c.msgs.indexOf(m), 1);
-    if (m.out === false || !m.out) S.deletedCount++;
+    if (!m.out) { S.deletedCount++; if (S.keepDeleted) JDEL.unshift({ id: c.id, chat: c.title, from: m.from || c.title, text: plainOf(m), sent: "сегодня в " + m.t, del: nowT() }); }
     renderAll("keep"); restoreScroll();
     toast(S.keepDeleted ? "Удалено. Копия осталась в локальной истории" : "Сообщение удалено");
   }, true]);
@@ -1225,6 +1475,7 @@ function sendMsg(x) {
   const m = { out: true, read: c.type === "saved", ...x };
   if (c.type === "channel") { m.out = false; m.views = "1"; }
   if (state.reply) { m.reply = { from: state.reply.from, text: state.reply.text }; state.reply = null; renderReplyBar(); }
+  if (state.conn === "offline") { m.pending = true; push(c, m); return; }
   push(c, m);
   afterSend(c, m);
 }
@@ -1359,6 +1610,7 @@ function renderInfo() {
   if (state.itab === "links") tc = links.length ? `<div class="ilist">${links.map(m => `<div class="il"><b>${esc(m.lp.title)}</b><span>${esc(m.lp.site)}</span></div>`).join("")}</div>` : none;
   info.innerHTML = `<div><div class="ihead"><span>${title}</span><button class="ib" data-act="closeinfo" title="Закрыть">${ic("close")}</button></div>
   <div class="iscroll"><div class="iprof">${avaHTML(c, 92)}<div class="in">${esc(c.title)}</div><div class="is">${statusText(c)}</div></div>${rows}
+  ${c.type === "private" ? `<label class="inote">Заметка<textarea rows="2" data-ik="note" maxlength="300" placeholder="Видна только вам, хранится на этом компьютере">${esc(c.note || "")}</textarea></label>` : ""}
   ${c.type !== "saved" ? `<label class="irow tgl">${ic("bell")}<span>Уведомления</span><input type="checkbox" data-ik="notif" ${c.muted ? "" : "checked"}><span class="sw"></span></label>` : ""}
   <div class="itabs">${tabs.map(t => `<button class="${state.itab === t[0] ? "on" : ""}" data-it="${t[0]}">${t[1]}${t[2] ? " " + t[2] : ""}</button>`).join("")}</div>${tc}</div></div>`;
 }
@@ -1367,6 +1619,7 @@ info.addEventListener("click", e => {
   const t = e.target.closest("[data-it]"); if (t) { state.itab = t.dataset.it; renderInfo(); return; }
   const p = e.target.closest(".ph"); if (p) openViewer(null, cur(), p.dataset.chart ? "chart" : +p.dataset.seed);
 });
+info.addEventListener("input", e => { if (e.target.dataset.ik === "note") cur().note = e.target.value; });
 info.addEventListener("change", e => { if (e.target.dataset.ik === "notif") { cur().muted = !e.target.checked; renderRail(); renderList(); renderHeader(); $("#chanmute").textContent = cur().muted ? "Включить уведомления" : "Отключить уведомления"; } });
 
 /* ---------- viewer ---------- */
@@ -1391,8 +1644,8 @@ viewer.addEventListener("click", e => {
 function renderDrawer() {
   const dark = root.dataset.theme === "dark";
   const d = (i, l, act) => `<button class="ditem" data-d="${act}">${ic(i)}<span>${l}</span></button>`;
-  drawer.innerHTML = `<div class="dprof">${meAva(56)}<div class="dn">${esc(S.name)}</div><div class="dp">+7 916 •••-••-12</div></div>
-  <nav class="dnav">${d("user", "Мой профиль", "set:account")}${d("users", "Создать группу", "set:newgroup")}${d("channel", "Создать канал", "set:newchannel")}${d("book", "Контакты", "set:contacts")}${d("phone", "Звонки", "set:calls")}${d("bookmark", "Избранное", "chat:saved")}${d("gear", "Настройки", "set:main")}
+  drawer.innerHTML = `<div class="dprof">${meAva(56)}<div class="dn">${esc(S.name)}</div><div class="dp">${mePhone()}</div><button class="ib dacc-t ${state.accOpen ? "open" : ""}" data-d="acc:toggle" title="Аккаунты">${ic("down")}</button></div>${accountsHTML()}
+  <nav class="dnav">${d("user", "Мой профиль", "set:account")}${d("users", "Создать группу", "set:newgroup")}${d("channel", "Создать канал", "set:newchannel")}${d("book", "Контакты", "set:contacts")}${d("phone", "Звонки", "set:calls")}${d("bookmark", "Избранное", "chat:saved")}<div class="dsep"></div>${d("download", "Загрузки", "set:downloads")}${d("pin", "Закладки", "set:bookmarks")}${d("history", "Удалённые и правки", "set:journal")}${d("search", "Поиск по истории", "do:search")}<div class="dsep"></div>${d("gear", "Настройки", "set:main")}${S.pass ? d("lock", "Заблокировать", "do:lock") : ""}
   <label class="ditem">${ic("moon")}<span>Ночной режим</span><input type="checkbox" id="nightT" ${dark ? "checked" : ""}><span class="sw"></span></label></nav>
   <div class="dfoot">tgx 0.1.0 · интерактивный макет</div>`;
 }
@@ -1402,8 +1655,9 @@ scrim.addEventListener("click", closeDrawer);
 drawer.addEventListener("click", e => {
   const b = e.target.closest("[data-d]"); if (!b) return;
   const [k, v] = b.dataset.d.split(":");
+  if (k === "acc") { drawerAccount(v); return; }
   closeDrawer();
-  if (k === "set") openSettings(v); else openChat(v);
+  if (k === "set") openSettings(v); else if (k === "do") (v === "lock" ? lockApp : openSearch)(); else openChat(v);
 });
 drawer.addEventListener("change", e => { if (e.target.id === "nightT") { S.theme = e.target.checked ? "dark" : "light"; applySettings(); } });
 
@@ -1425,12 +1679,14 @@ const routeName = r => ({ ws: "WebSocket", proxy: "MTProxy", direct: "напря
 
 const PAGES = {
   main: { t: "Настройки", h: () =>
-    `<div class="sprof">${meAva(68)}<div><div class="spn">${esc(S.name)}</div><div class="sps">+7 916 •••-••-12</div><div class="sps">@${esc(S.username)}</div></div></div>` +
+    `<div class="sprof">${meAva(68)}<div><div class="spn">${esc(S.name)}</div><div class="sps">${mePhone()}</div><div class="sps">@${esc(S.username)}</div></div></div>` +
     sect("", row("user", "Мой аккаунт", "", "account") + row("bell", "Уведомления и звуки", "", "notify") + row("lock", "Конфиденциальность", "", "privacy") +
       row("chats", "Настройки чатов", "", "chats") + row("folder", "Папки", "", "folders") + row("data", "Данные и память", "", "advanced") +
       row("battery", "Энергосбережение", "", "power") + row("device", "Устройства", String(S.sessions.length + 1), "devices") + row("lang", "Язык", { ru: "Русский", en: "English", uk: "Українська", de: "Deutsch" }[S.lang], "lang")) +
     sect("tgx", row("net", "Подключение", routeName(activeRoute()), "connection") + row("ghost", "Призрачный режим", S.ghostRead || S.ghostOnline || S.ghostTyping ? "вкл" : "выкл", "ghost") +
-      row("history", "Удалённые и изменённые", S.keepDeleted ? "сохраняются" : "выкл", "deleted") + row("info", "О программе", "0.1.0", "about")) +
+      row("history", "Удалённые и изменённые", S.keepDeleted ? "сохраняются" : "выкл", "deleted") + row("download", "Загрузки", dlSummary(), "downloads") +
+      row("pin", "Закладки", String(bookmarks().length), "bookmarks") + row("bot", "Автоматизация", S.autoReply ? "автоответ вкл" : "", "automation") +
+      row("text", "Горячие клавиши", "", "hotkeys") + row("info", "О программе", "0.1.0", "about")) +
     sect("", act("danger", "Выйти", "logout", "logout")) },
   account: { t: "Мой аккаунт", h: () =>
     `<div class="iprof">${meAva(92)}<button class="sbtn" data-act="photo">Изменить фото</button></div>` +
@@ -1444,7 +1700,7 @@ const PAGES = {
     sect("Счётчик", tog("countMuted", "Учитывать чаты без звука", "Счётчики в папках и на значке приложения")) },
   privacy: { t: "Конфиденциальность", h: () =>
     sect("Конфиденциальность", Object.keys(PRIVT).map(k => row("", PRIVT[k], PRIVL[S.priv[k]], "priv:" + k)).join("")) +
-    sect("Безопасность", row("lock", "Облачный пароль", "вкл") + row("", "Код-пароль", "выкл", "", "Шифрует локальную базу TDLib · M3") + row("", "Чёрный список", "3") + row("", "Автоудаление сообщений", "выкл")) +
+    sect("Безопасность", row("lock", "Облачный пароль", "вкл") + row("", "Код-пароль", S.pass ? "вкл" : "выкл", "passcode", "Блокирует окно и шифрует локальную базу") + row("", "Чёрный список", "3") + row("", "Автоудаление сообщений", "выкл")) +
     sect("Удалить аккаунт", row("", "При неактивности", "12 мес.")) },
   priv: { t: k => PRIVT[k], h: k =>
     sect(`Кто видит: ${PRIVT[k].toLowerCase()}`, radio("priv." + k, "all", "Все") + radio("priv." + k, "contacts", "Мои контакты") + radio("priv." + k, "nobody", "Никто"),
@@ -1468,7 +1724,7 @@ const PAGES = {
     sect("Ограничение кеша", radio("cacheLimit", "1", "1 ГБ") + radio("cacheLimit", "5", "5 ГБ") + radio("cacheLimit", "0", "Без ограничений")) +
     sect("Автозагрузка медиа", tog("dlPrivate", "Личные чаты", "Фото, голосовые, файлы до 10 МБ") + tog("dlGroups", "Группы", "Фото и голосовые") + tog("dlChannels", "Каналы", "Только фото")) +
     sect("Загрузки", row("folder", "Папка для файлов", "Загрузки\\tgx") + tog("askPath", "Спрашивать, куда сохранять")) +
-    sect("", row("download", "Экспорт данных", "M4")); } },
+    sect("", row("download", "Экспорт и резервные копии", "", "export")); } },
   power: { t: "Энергосбережение", h: () =>
     sect("", tog("anims", "Анимации интерфейса") + tog("autoplayVideo", "Автовоспроизведение видео") + tog("autoplayGif", "Автовоспроизведение GIF") +
       tog("trayMode", "Режим трея", "При сворачивании выгружать историю чатов из памяти · M1"), "Без анимаций меньше нагрузка на процессор и батарею.") },
@@ -1483,7 +1739,7 @@ const PAGES = {
     const ar = activeRoute(), px = S.proxies[0];
     const rr = (n, label, k, st, ping, on) => `<label class="srow"><span class="ord">${n}</span><span class="sl">${label}<small><span class="dot ${st[0]}"></span>${st[1]}${ping ? " · " + ping : ""}</small></span>${k ? `<input type="checkbox" data-k="${k}" ${on ? "checked" : ""}><span class="sw"></span>` : ""}</label>`;
     const st = (r, on) => !on ? ["off", "выключен"] : ar === r ? (state.conn === "ready" ? ["ok", "активен"] : ["warn", "подключение…"]) : ["ok", "резерв"];
-    return sect("Режим",
+    return sect("", row("net", "Диагностика сети", state.conn === "ready" ? "48 мс" : "", "diag", "Задержка по дата-центрам, скорость и журнал переключений")) + sect("Режим",
       radio("route", "auto", "Автоматически", "Перебирает маршруты по порядку и запоминает рабочий для каждой сети") +
       radio("route", "ws", "Только WebSocket", "Без переключения. Если WS недоступен — нет связи, а не тихий откат на прямое") +
       radio("route", "proxy", "Только свой прокси", "MTProxy или SOCKS5 из списка ниже") +
@@ -1503,15 +1759,16 @@ const PAGES = {
   deleted: { t: "Удалённые и изменённые", h: () =>
     sect("", tog("keepDeleted", "Сохранять удалённые сообщения") + tog("keepEdits", "Сохранять историю правок"),
       "Сообщения пишутся в локальную базу SQLite на этом компьютере. Медиафайлы не сохраняются — только текст и метаданные.") +
+    sect("", row("history", "Открыть журнал", "", "journal")) +
     sect("Локальная база", row("trash", "Удалённых сообщений", String(S.deletedCount)) + row("history", "Правок", "112") + row("data", "Размер базы", "2,1 МБ")) },
   about: { t: "О программе", h: () =>
     `<div class="about"><div class="mark">tgx</div><div class="an">tgx</div><div class="av">0.1.0 · интерактивный макет</div><p class="snote">Клиент Telegram для Windows со встроенным WebSocket-транспортом.</p></div>` +
-    sect("Компоненты", row("", "TDLib", "BSL-1.0") + row("", "Slint", "royalty-free") + row("", "tg-ws-proxy (Flowseal)", "MIT")) +
+    updateHTML() + sect("Компоненты", row("", "TDLib", "BSL-1.0") + row("", "Slint", "royalty-free") + row("", "tg-ws-proxy (Flowseal)", "MIT")) +
     sect("", "", "tgx использует собственный api_id и не является официальным приложением Telegram.") },
   contacts: { t: "Контакты", h: () =>
     sect("", CONTACTS.map(([n, s]) => `<button class="srow" data-act="openContact" data-n="${esc(n)}">${avaName(n, 40)}<span class="sl">${esc(n)}<small${s === "в сети" ? ' class="acc"' : ""}>${s}</small></span></button>`).join("")) },
   calls: { t: "Звонки", h: () =>
-    sect("Недавние", CALLS.map(([n, d, w, l]) => `<div class="srow static callrow">${avaName(n, 40)}<span class="sl">${esc(n)}<small>${ic(d === "out" ? "arrOut" : "arrIn", d === "missed" ? "missed" : d === "in" ? "inc" : "")} ${w}</small></span><span class="sv" style="color:var(--muted)">${l}</span></div>`).join(""), "Сами звонки появятся в M6. Сейчас tgx показывает только историю.") },
+    sect("Недавние", CALLS.map(([n, d, w, l]) => `<button class="srow callrow" data-act="callTo" data-n="${esc(n)}">${avaName(n, 40)}<span class="sl">${esc(n)}<small>${ic(d === "out" ? "arrOut" : "arrIn", d === "missed" ? "missed" : d === "in" ? "inc" : "")} ${w}</small></span><span class="sv" style="color:var(--muted)">${l}</span></button>`).join(""), "Нажмите на строку, чтобы перезвонить.") },
   newgroup: { t: "Новая группа", h: () =>
     sect("Название", `<div class="sfield"><input id="ngname" maxlength="64" placeholder="Название группы"></div>`) +
     sect("Участники", CONTACTS.map(([n]) => `<label class="srow">${avaName(n, 36)}<span class="sl">${esc(n)}</span><input type="checkbox" class="ckb" value="${esc(n)}"></label>`).join("")) +
@@ -1551,6 +1808,7 @@ mbody.addEventListener("input", e => {
   if (el.type === "range") { S.font = +el.value; $("#fontv").textContent = S.font + " px"; applySettings(); return; }
   if (el.type === "text" || el.tagName === "TEXTAREA" || !el.type) {
     setK(k, el.value);
+    if (k === "sni" || k === "autoReplyText") return;
     if (k === "bio") $("#biocnt").textContent = 70 - el.value.length;
     renderDrawer();
   }
@@ -1606,28 +1864,31 @@ function renderStatus() {
   else chain = `<span class="hop ${ar === S.route ? "cur" : "dis"}">только ${{ ws: "WS", proxy: "MTProxy", direct: "direct" }[S.route]}</span>`;
   const px = S.proxies[0];
   const host = { ws: "kws2.web.telegram.org · DC2", proxy: px ? `${px.host}:${px.port} · DC2` : "", direct: "149.154.167.51 · DC2", none: "" }[ar];
-  const ping = { ws: "48 ms · ↓ 1.2 MB/s", proxy: "112 ms · ↓ 0.8 MB/s", direct: "61 ms", none: "" }[ar];
-  const [dot, label] = ar === "none" ? ["bad", "нет маршрута"] : state.conn === "ready" ? ["ok", "готово"] : ["warn", "подключение…"];
+  const ping = { ws: "48 ms", proxy: "112 ms", direct: "61 ms", none: "" }[ar];
+  const [dot, label] = state.conn === "offline" ? ["bad", "нет сети"] : ar === "none" ? ["bad", "нет маршрута"] : state.conn === "ready" ? ["ok", "готово"] : ["warn", "подключение…"];
   const ghost = S.ghostRead || S.ghostOnline || S.ghostTyping;
-  statusEl.innerHTML = `<span><span class="dot ${dot}"></span><b>${label}</b></span><span class="chain">${chain}</span><span>${host}</span>${ar === "direct" ? '<span class="tag warn">видно провайдеру</span>' : ""}${ghost ? '<span class="tag">призрак</span>' : ""}<span class="r">${state.conn === "ready" ? ping : ""}</span>`;
+  statusEl.innerHTML = `<span><span class="dot ${dot}"></span><b>${label}</b></span><span class="chain">${chain}</span><span>${host}</span>${ar === "direct" ? '<span class="tag warn">видно провайдеру</span>' : ""}${ghost ? '<span class="tag">призрак</span>' : ""}${dlStatus()}<span class="r" data-st="diag">${state.conn === "ready" ? ping : ""}</span>`;
+  renderNetban();
   const lr = $("#lroute", login);
   if (lr) lr.innerHTML = state.conn === "ready" ? `<span class="dot ${dot}"></span>соединение: ${routeName(ar)} · DC2 · ${ping.split(" ·")[0]}` : `<span class="dot warn"></span>подключение: ${routeName(ar)} → DC2 · рукопожатие…`;
 }
 let connT = null;
 function connect() {
   state.conn = "connecting"; clearTimeout(connT);
-  connT = setTimeout(() => { state.conn = "ready"; renderStatus(); if (!mwrap.hidden && nav[nav.length - 1] === "connection") renderPage(true); }, 900);
+  connT = setTimeout(() => { state.conn = "ready"; flushPending(); renderStatus(); if (!mwrap.hidden && nav[nav.length - 1] === "connection") renderPage(true); }, 900);
 }
-statusEl.addEventListener("click", () => { if (state.loggedIn) openSettings("connection"); });
+statusEl.addEventListener("click", e => { if (!state.loggedIn || state.locked) return; const t = e.target.closest("[data-st]"); openSettings(t ? t.dataset.st : "connection"); });
 
 /* ---------- theme & settings application ---------- */
 const mq = matchMedia("(prefers-color-scheme: dark)");
 function applySettings() {
   const dark = S.theme === "dark" || (S.theme === "system" && mq.matches);
   root.dataset.theme = dark ? "dark" : "light";
-  root.style.setProperty("--accent", ACC[S.accent][dark ? 1 : 0]);
+  root.style.setProperty("--accent-l", ACC[S.accent][0]); root.style.setProperty("--accent-d", ACC[S.accent][1]);
   root.style.setProperty("--msg", S.font + "px");
   root.classList.toggle("no-anim", !S.anims);
+  root.classList.toggle("compact", S.compact);
+  if (document.body.dataset.view === "ds") renderDS();
   hist.className = "history bg-" + S.bg;
   renderStatus();
   const n = $("#nightT"); if (n) n.checked = dark;
@@ -1703,8 +1964,10 @@ login.addEventListener("keydown", e => { if (e.key === "Enter") { const p = $(".
 
 /* ---------- keyboard ---------- */
 document.addEventListener("keydown", e => {
-  if (e.key !== "Escape") return;
+  if (hotkey(e)) return;
+  if (e.key !== "Escape" || state.locked) return;
   if (rec) { finishRec(false); return; }
+  if (!spw.hidden) { closeSearch(); return; }
   if (!ctx.hidden) { ctx.hidden = true; return; }
   if (!viewer.hidden) { viewer.hidden = true; return; }
   if (!mwrap.hidden) { if (nav.length > 1) { nav.pop(); renderPage(); } else closeModal(); return; }
@@ -1715,7 +1978,6 @@ document.addEventListener("keydown", e => {
 });
 
 /* ---------- page controls ---------- */
-$("#toLogin").addEventListener("click", () => { closeModal(); closeDrawer(); viewer.hidden = true; state.loggedIn = false; pause(); renderLogin("phone"); });
 $("#reset").addEventListener("click", () => { location.hash = ""; location.reload(); });
 
 /* ---------- live events ---------- */
@@ -1723,6 +1985,666 @@ function scheduleLife() {
   setTimeout(() => { const c = chatOf("sveta"); if (!c) return; c.typing = false; push(c, T(null, "и ещё пункт 6.1 — там про залог", null)); }, 7000);
   setTimeout(() => { const c = chatOf("anton"); if (!c) return; push(c, T(null, "кстати, глянь потом spike-report, там график по медиа через WS", null)); }, 22000);
 }
+
+/* ====================================================================
+   Screens beyond the MVP core: accounts, downloads, diagnostics, journal,
+   bookmarks, export, passcode and lock, search, calls, offline state.
+   ==================================================================== */
+Object.assign(I, {
+  clock: '<circle cx="9" cy="9" r="6.5"/><path d="M9 5.5V9l2.3 1.6"/>',
+  micoff: '<rect x="6.5" y="2" width="5" height="9" rx="2.5"/><path d="M4 9a5 5 0 0010 0M9 14v2.5M3 3l12 12"/>',
+  video: '<rect x="2" y="5" width="10" height="8" rx="1.5"/><path d="M12 8.2l4-2.4v6.4l-4-2.4"/>',
+  retry: '<path d="M15 9a6 6 0 11-1.8-4.3M15 3v3h-3"/>'
+});
+const spw = $("#spw"), lock = $("#lock"), callbox = $("#callbox"), dsEl = $("#ds");
+const onPage = p => !mwrap.hidden && nav[nav.length - 1] === p;
+
+/* ---------- accounts ---------- */
+function mePhone() { return esc(S.accounts[S.acc].phone); }
+function accountsHTML() {
+  if (!state.accOpen) return "";
+  return `<div class="daccs">${S.accounts.map((a, i) => `<button class="ditem" data-d="acc:${i}"><div class="ava" style="--s:32px;background:${i === S.acc ? "var(--accent);color:var(--accent-ink)" : colOf(a.name)}">${esc(initials(a.name))}</div><span>${esc(a.name)}<small>${esc(a.phone)}</small></span>${i === S.acc ? ic("check", "cur") : a.unread ? `<b class="badge">${a.unread}</b>` : ""}</button>`).join("")}<button class="ditem" data-d="acc:add">${ic("user")}<span>Добавить аккаунт</span></button></div>`;
+}
+function drawerAccount(v) {
+  if (v === "toggle") state.accOpen = !state.accOpen;
+  else if (v === "add") { closeDrawer(); pause(); state.loggedIn = false; renderLogin("phone"); return; }
+  else if (+v !== S.acc) {
+    Object.assign(S.accounts[S.acc], { name: S.name, username: S.username });
+    S.acc = +v; const a = S.accounts[S.acc]; S.name = a.name; S.username = a.username; a.unread = 0; state.accOpen = false;
+    toast(`Аккаунт «${a.name}». В макете список чатов общий`);
+  }
+  renderDrawer(); drawer.classList.add("open");
+}
+
+/* ---------- downloads ---------- */
+const DL = [
+  { id: 1, name: "tdlib-1.8.51-win-x64.zip", ext: "ZIP", size: 48, done: 31.4, st: "active", chat: "Рабочая группа", base: 1.4 },
+  { id: 2, name: "Запись созвона 7 ноября.mp4", ext: "MP4", size: 412, done: 96, st: "active", chat: "Рабочая группа", base: 0.9 },
+  { id: 3, name: "slint-1.9-docs.pdf", ext: "PDF", size: 23.5, done: 14.6, st: "error", chat: "Slint", base: 1.1, err: "связь оборвалась на DC4" },
+  { id: 4, name: "Фото с дачи.zip", ext: "ZIP", size: 86, done: 0, st: "queued", chat: "Мама", base: 1.2 },
+  { id: 5, name: "spike-report.pdf", ext: "PDF", size: 1.3, done: 1.3, st: "done", chat: "Рабочая группа", base: 1 },
+  { id: 6, name: "Договор_аренды_2026.docx", ext: "DOC", size: 0.1, done: 0.1, st: "done", chat: "Света Лебедева", base: 1 }
+];
+DL.forEach(d => d.rate = d.st === "active" ? d.base : 0);
+const mb = n => (n >= 100 || +n.toFixed(1) % 1 === 0 ? String(Math.round(n)) : n.toFixed(1).replace(".", ",")) + " МБ";
+const dlActive = () => DL.filter(d => d.st === "active");
+const dlRate = () => dlActive().reduce((a, d) => a + d.rate, 0);
+const dlStatusText = () => `↓ ${dlActive().length} · ${dlRate().toFixed(1)} MB/s`;
+function dlSummary() { const a = dlActive().length; return a ? `${a} ${plural(a, "файл", "файла", "файлов")}` : ""; }
+function dlStatus() { return dlActive().length && state.conn === "ready" ? `<span data-st="downloads" title="Открыть загрузки">${dlStatusText()}</span>` : ""; }
+function dlEta(d) { const s = (d.size - d.done) / Math.max(d.rate, .01); return s > 3600 ? "больше часа" : s >= 60 ? `≈ ${Math.round(s / 60)} мин` : `≈ ${Math.max(1, Math.round(s))} с`; }
+function dlSub(d) {
+  const p = d.size ? Math.round(d.done * 100 / d.size) : 0;
+  if (d.st === "active") return `<span>${mb(d.done)} из ${mb(d.size)}</span><span>${d.rate.toFixed(1).replace(".", ",")} МБ/с</span><span>${dlEta(d)}</span>`;
+  if (d.st === "paused") return `<span>${mb(d.done)} из ${mb(d.size)}</span><span>пауза</span>`;
+  if (d.st === "error") return `<span class="err">${esc(d.err)}</span><span>${p}%</span>`;
+  if (d.st === "queued") return `<span>${mb(d.size)}</span><span>в очереди</span>`;
+  return `<span>${mb(d.size)}</span><span>${esc(d.chat)}</span>`;
+}
+function dlRow(d) {
+  const b = (a, i, t) => `<button class="ib" data-act="dl" data-a="${a}" data-id="${d.id}" title="${t}">${ic(i)}</button>`;
+  const acts = { active: b("pause", "pause", "Пауза") + b("cancel", "close", "Отменить"), paused: b("resume", "play", "Продолжить") + b("cancel", "close", "Отменить"),
+    error: b("resume", "retry", "Повторить") + b("cancel", "close", "Убрать"), queued: b("first", "play", "Скачать сейчас") + b("cancel", "close", "Убрать"), done: b("open", "folder", "Показать в папке") }[d.st];
+  return `<div class="dl ${d.st}" data-id="${d.id}"><span class="fic">${d.st === "done" ? `<span class="fext">${d.ext}</span>` : ic("download")}</span><div class="dm"><div class="dn">${esc(d.name)}</div>${d.st === "done" ? "" : `<div class="prog"><i style="--p:${(d.done * 100 / d.size).toFixed(1)}"></i></div>`}<div class="dsub">${dlSub(d)}</div></div><div class="dact">${acts}</div></div>`;
+}
+
+/* ---------- network diagnostics ---------- */
+const DCS = [["DC1", 71, ""], ["DC2", 48, "cur"], ["DC3", 66, ""], ["DC4", 54, ""], ["DC5", 0, "bad"], ["DC2 медиа", 58, ""], ["DC4 медиа", 312, "warn"]];
+const NETLOG = [
+  ["14:02:11", "ok", "<b>WS</b> снова отвечает, возврат на первый маршрут, 48 мс"],
+  ["13:58:41", "ok", "<b>MTProxy</b> proxy.example.net:443, 112 мс"],
+  ["13:58:40", "warn", "<b>WS</b>, DC4 медиа: три таймаута подряд, маршрут переключён целиком"],
+  ["11:48:02", "acc", "сеть «Дом Wi-Fi»: запомнен маршрут <b>WS</b>"],
+  ["11:48:00", "ok", "запуск, сессия из кеша, список чатов через 0,9 с"]
+];
+const pingHist = Array.from({ length: 60 }, (_, i) => 44 + Math.round(9 * Math.abs(Math.sin(i * 1.7))) + (i * 7) % 5 + (i === 37 ? 58 : 0));
+function sparkSVG(v) {
+  const mx = Math.max(...v, 80), n = v.length - 1, pts = v.map((y, i) => `${(i * 300 / n).toFixed(1)} ${(42 - y / mx * 38).toFixed(1)}`);
+  return `<svg class="spark" viewBox="0 0 300 44" preserveAspectRatio="none" role="img" aria-label="Задержка за последнюю минуту"><path class="ar" d="M0 44 L${pts.join(" L")} L300 44Z"/><path d="M${pts.join(" L")}"/></svg>`;
+}
+const dcTable = () => `<table class="dct">${DCS.map(([n, ms, st]) => `<tr class="${st}"><td>${n}</td><td><div class="bar"><i style="--w:${Math.min(100, ms / 3.5).toFixed(0)}"></i></div></td><td>${st === "bad" ? "нет ответа" : state.probing ? "проверка…" : ms + " мс"}</td></tr>`).join("")}</table>`;
+const netLog = () => `<ul class="log">${NETLOG.map(([t, d, x]) => `<li><span>${t}</span><span class="dot ${d}"></span><span>${x}</span></li>`).join("")}</ul>`;
+
+/* ---------- journal of deleted and edited messages, bookmarks ---------- */
+const JDEL = [
+  { id: "work", chat: "Рабочая группа", from: "Игорь Дегтярёв", text: "Поправка: на стенде пока старая сборка, не смотрите", sent: "сегодня в 14:07", del: "14:11" },
+  { id: "house", chat: "Дом, подъезд 3", from: "Сосед из 41-й", text: "Продаю зимнюю резину, недорого, пишите в личку", sent: "вчера в 21:15", del: "21:16" },
+  { id: "pavel", chat: "Павел Егоров", from: "Павел Егоров", text: "Не туда, извини", sent: "6 ноября в 20:40", del: "20:40" }
+];
+const JED = [
+  { id: "anton", chat: "Антон Ковалёв", from: "Антон Ковалёв", a: "адрес скину завтра утром", b: "адрес скину ближе к делу", at: "сегодня в 14:06" },
+  { id: "net", chat: "Сетевые заметки", from: "Сетевые заметки", a: "Провайдеры режут UDP на 443 порту у двух операторов.", b: "Провайдеры режут UDP на 443 порту у трёх операторов.", at: "вчера в 10:20" }
+];
+function wdiff(a, b) {
+  const x = a.split(" "), y = b.split(" "); let i = 0, j = 0;
+  while (i < x.length && i < y.length && x[i] === y[i]) i++;
+  while (j < x.length - i && j < y.length - i && x[x.length - 1 - j] === y[y.length - 1 - j]) j++;
+  const mid = arr => arr.slice(i, arr.length - j).join(" ");
+  return [esc(x.slice(0, i).join(" ")), mid(x) ? `<del>${esc(mid(x))}</del>` : "", mid(y) ? `<ins>${esc(mid(y))}</ins>` : "", esc(x.slice(x.length - j).join(" "))].filter(Boolean).join(" ");
+}
+const jAva = x => chatOf(x.id) ? avaHTML({ ...chatOf(x.id), online: false }, 36) : avaName(x.chat, 36);
+const jHead = x => `<div class="jh">${esc(x.chat)}${x.from !== x.chat ? ` <span>${esc(x.from)}</span>` : ""}</div>`;
+const jGo = (x, mid) => chatOf(x.id) ? `<button class="ib" data-act="goMsg" data-id="${x.id}" ${mid ? `data-mid="${mid}"` : ""} title="Открыть чат">${ic("chev")}</button>` : "<span></span>";
+const jDelRow = x => `<div class="jr">${jAva(x)}<div>${jHead(x)}<div class="jt">${esc(x.text)}</div><div class="jm">отправлено ${x.sent}, удалено в ${x.del}</div></div>${jGo(x)}</div>`;
+const jEdRow = x => `<div class="jr">${jAva(x)}<div>${jHead(x)}<div class="jt">${wdiff(x.a, x.b)}</div><div class="jm">изменено ${x.at}</div></div>${jGo(x)}</div>`;
+function bookmarks() {
+  const out = [];
+  CH.forEach(c => { let day = ""; c.msgs.forEach(m => { if (m.day) day = m.day; else if (m.bm) out.push({ c, m, day }); }); });
+  return out;
+}
+[["saved", "tg-ws-proxy"], ["work", "Один DC напрямую"]].forEach(([id, part]) => { const m = chatOf(id).msgs.find(x => (x.text || "").includes(part)); if (m) m.bm = true; });
+function showEdits(m, el) {
+  const r = el.getBoundingClientRect();
+  ctx.innerHTML = `<h5>История правок, хранится локально</h5>` + m.edits.map(([t, x], i) => `<div class="ver"><small>${t}${i === m.edits.length - 1 ? " · текущая" : ""}</small>${esc(x)}</div>`).join("");
+  ctxFns = []; ctxReact = null; ctx.hidden = false;
+  ctx.style.left = Math.max(4, Math.min(r.left - 140, innerWidth - ctx.offsetWidth - 8)) + "px";
+  ctx.style.top = Math.max(4, Math.min(r.bottom + 6, innerHeight - ctx.offsetHeight - 8)) + "px";
+}
+
+/* ---------- updates ---------- */
+function updateHTML() {
+  const u = state.upd || "idle";
+  const body = u === "checking" ? `<div class="srow static"><span class="sl">Проверяю обновления…<small>GitHub Releases</small></span></div>`
+    : u === "found" ? `<div class="srow static"><span class="sl">Доступна версия 0.2.0<small><span class="dot ok"></span>подпись проверена, 6,4 МБ</small></span><button class="sbtn pri" data-act="updInstall">Обновить и перезапустить</button></div>`
+    : `<div class="srow static"><span class="sl">Версия 0.1.0<small>${u === "latest" ? "Обновление поставится при следующем запуске" : "Последняя проверка: сегодня в 11:48"}</small></span><button class="sbtn" data-act="updCheck">Проверить</button></div>`;
+  return sect("Обновления", body, "Обновление ставится только после проверки подписи. Без вашего согласия ничего не скачивается.");
+}
+
+/* ---------- settings pages ---------- */
+const KEYS = [
+  ["Навигация", [["Поиск по всей истории", "Ctrl K"], ["Следующий чат", "Alt ↓"], ["Предыдущий чат", "Alt ↑"], ["Назад, закрыть, отменить", "Esc"]]],
+  ["Чат", [["Поиск в открытом чате", "Ctrl F"], ["Ответить на сообщение", "двойной щелчок"], ["Новая строка", "Shift Enter"]]],
+  ["Приложение", [["Настройки", "Ctrl ,"], ["Загрузки", "Ctrl J"], ["Заблокировать", "Ctrl L"]]]
+];
+const keysHTML = () => KEYS.map(([t, rows]) => sect(t, rows.map(([l, k]) => `<div class="keys"><span>${l}</span><span>${k.includes(" ") && !/[а-я]/.test(k) ? k.split(" ").map(x => `<kbd>${x}</kbd>`).join("") : `<kbd>${k}</kbd>`}</span></div>`).join(""))).join("");
+Object.assign(PAGES, {
+  downloads: { t: "Загрузки", h: () => {
+    const now = DL.filter(d => ["active", "paused", "error"].includes(d.st)), q = DL.filter(d => d.st === "queued"), done = DL.filter(d => d.st === "done");
+    return (DL.length ? "" : `<div class="inone">Загрузок нет. Файлы появятся здесь, когда вы начнёте скачивать их из чатов.</div>`) +
+      (now.length ? sect("Сейчас", now.map(dlRow).join("")) : "") + (q.length ? sect("В очереди", q.map(dlRow).join("")) : "") +
+      (done.length ? sect("Готово", done.map(dlRow).join("") + act("accent", "Очистить список", "dlClear"), "Файлы остаются в папке Загрузки\\tgx, из списка убираются только записи.") : "") +
+      sect("Одновременно", radio("dlParallel", "1", "По одному файлу") + radio("dlParallel", "2", "Два файла") + radio("dlParallel", "4", "Четыре файла"), "Большие файлы скачиваются частями в несколько соединений.") +
+      sect("Ограничение скорости", radio("dlLimit", "0", "Без ограничения") + radio("dlLimit", "1", "1 МБ/с") + radio("dlLimit", "5", "5 МБ/с")) +
+      sect("", row("data", "Автозагрузка и папки", "", "advanced"));
+  } },
+  diag: { t: "Диагностика сети", h: () => {
+    const ar = activeRoute(), ok = state.conn === "ready" && ar !== "none", px = S.proxies[0];
+    const host = { ws: "WebSocket, kws2.web.telegram.org", proxy: px ? `${px.type}, ${esc(px.host)}:${px.port}` : "", direct: "напрямую, 149.154.167.51", none: "нет маршрута" }[ar];
+    return `<div class="sgroup" style="padding:0"><div class="diag"><div class="big"><span id="pingv">${ok ? pingHist[59] : "—"}</span><small>мс</small></div><div id="sparkbox">${sparkSVG(pingHist)}</div>
+      <div class="rt"><span class="dot ${ok ? "ok" : state.conn === "offline" || ar === "none" ? "bad" : "warn"}"></span>${host}${ar === "none" ? "" : ", DC2"}</div></div>
+      <div class="stats"><div><b>${dlRate().toFixed(1).replace(".", ",")} МБ/с</b>приём</div><div><b>0,1 МБ/с</b>отдача</div><div><b>2 ч 14 мин</b>на связи</div><div><b>2</b>переключения</div></div></div>` +
+      sect(`Дата-центры через ${routeName(ar)}`, dcTable() + `<div class="pxbtns" style="padding-top:8px"><button class="sbtn" data-act="probe">Проверить заново</button><button class="sbtn" data-act="copyDiag">Скопировать отчёт</button></div>`,
+        "Если недоступный дата-центр понадобится, tgx переключит маршрут целиком. Один дата-центр отдельно напрямую не идёт.") +
+      sect("Журнал переключений", netLog()) +
+      sect("Обход блокировок", tog("doh", "DNS поверх HTTPS", "Адреса серверов узнаются не через DNS провайдера") + tog("frag", "Дробить первое TLS-сообщение", "Фильтру сложнее увидеть имя сервера") +
+        `<div class="pxform" style="grid-template-columns:1fr"><label>Имя сервера в TLS (SNI)<input data-k="sni" placeholder="по умолчанию: имя сервера Telegram" value="${esc(S.sni)}"></label></div>`,
+        "Сертификат сервера проверяется при любых настройках.");
+  } },
+  journal: { t: "Удалённые и правки", h: () => {
+    const del = state.jtab === "deleted", list = (del ? JDEL.map(jDelRow) : JED.map(jEdRow)).join("");
+    return `<div class="ptabs"><button class="${del ? "on" : ""}" data-jt="deleted">Удалённые ${JDEL.length}</button><button class="${del ? "" : "on"}" data-jt="edits">Правки ${JED.length}</button></div>` +
+      ((del ? S.keepDeleted : S.keepEdits) ? "" : `<p class="snote" style="margin-top:10px">Сохранение выключено: новые записи не добавляются.</p>`) +
+      (list || `<div class="inone">Здесь пока пусто</div>`) +
+      (list ? `<div class="sgroup" style="border-top:8px solid var(--pane)">${act("danger", "Очистить этот список", "jClear", "trash")}<p class="snote">Записи хранятся только на этом компьютере. После очистки вернуть их нельзя.</p></div>` : "");
+  } },
+  bookmarks: { t: "Закладки", h: () => {
+    const bm = bookmarks();
+    return bm.length ? bm.map(({ c, m, day }) => `<div class="jr">${avaHTML({ ...c, online: false }, 36)}<div><div class="jh">${esc(c.title)}${c.type === "group" || m.out ? ` <span>${esc(m.out ? "Вы" : m.from)}</span>` : ""}</div><div class="jt">${esc(plainOf(m))}</div><div class="jm">${day === TODAY ? "сегодня" : day} в ${m.t}</div></div><button class="ib" data-act="goMsg" data-id="${c.id}" data-mid="${m.id}" title="Перейти к сообщению">${ic("chev")}</button></div>`).join("") +
+      `<p class="snote" style="margin-top:10px">Закладки видны только вам и хранятся на этом компьютере.</p>`
+      : `<div class="inone">Закладок пока нет. Щёлкните правой кнопкой по сообщению и выберите «В закладки».</div>`;
+  } },
+  export: { t: "Экспорт и резервные копии", h: () =>
+    sect("Формат", radio("expFormat", "html", "HTML", "Открывается в браузере и выглядит как чат") + radio("expFormat", "json", "JSON", "Для обработки скриптами") + radio("expFormat", "md", "Markdown", "Простой текст с разметкой")) +
+    sect("Что сохранять", row("chats", "Чаты", `все, ${CH.length}`) + tog("expText", "Текст сообщений") + tog("expPhoto", "Фотографии") + tog("expFiles", "Файлы и голосовые", "Занимают больше всего места")) +
+    sect("Период", radio("expPeriod", "all", "Вся история") + radio("expPeriod", "month", "Последний месяц") + radio("expPeriod", "week", "Последняя неделя")) +
+    sect("Резервная копия по расписанию", radio("expSched", "off", "Только вручную") + radio("expSched", "day", "Каждый день") + radio("expSched", "week", "Каждую неделю"), "Копии пишутся в Документы\\tgx\\backup. Старые копии сами не удаляются.") +
+    (state.exp == null ? `<div class="pxbtns" style="padding-top:12px"><button class="sbtn pri" data-act="exportRun" ${S.expText || S.expPhoto || S.expFiles ? "" : "disabled"}>Экспортировать</button></div>`
+      : `<div class="sfield" style="padding-top:14px"><div class="prog"><i id="expbar" style="--p:${state.exp}"></i></div><p class="snote" style="margin:8px 0 0" id="exptxt">Экспорт: ${state.exp}%</p></div><div class="pxbtns"><button class="sbtn" data-act="exportStop">Остановить</button></div>`) },
+  passcode: { t: "Код-пароль", h: () => {
+    if (state.pc) return sect(state.pc.step === 1 ? "Придумайте код из четырёх цифр" : "Повторите код",
+      `<div class="pcset"><div class="code" id="pcin">${'<input maxlength="1" inputmode="numeric" type="password" autocomplete="off" aria-label="Цифра кода">'.repeat(4)}</div><div class="lerr">${state.pc.err || ""}</div></div>`,
+      "Код нельзя восстановить. Если забудете его, придётся войти в аккаунт заново, а локальная база будет удалена.");
+    if (!S.pass) return sect("", `<p class="snote" style="margin-top:10px">Код-пароль закрывает окно tgx и шифрует локальную базу. Без кода не прочитать ни чаты, ни сохранённые удалённые сообщения.</p>` + act("accent", "Задать код-пароль", "pcStart"));
+    return sect("", act("accent", "Заблокировать сейчас", "lockNow", "lock") + act("", "Изменить код", "pcStart")) +
+      sect("Блокировать автоматически", radio("autoLock", "1", "Через минуту без действий") + radio("autoLock", "5", "Через 5 минут") + radio("autoLock", "60", "Через час") + radio("autoLock", "tray", "При сворачивании в трей")) +
+      sect("", tog("hello", "Windows Hello", "Разблокировка отпечатком, лицом или ПИН-кодом Windows")) + sect("", act("danger", "Выключить код-пароль", "pcOff"));
+  } },
+  hotkeys: { t: "Горячие клавиши", h: () => keysHTML() + sect("", "", "Свои сочетания можно будет задать позже.") },
+  automation: { t: "Автоматизация", h: () =>
+    sect("Автоответ", tog("autoReply", "Отвечать автоматически", "Только в личных чатах, не чаще раза в час одному собеседнику") +
+      (S.autoReply ? `<div class="sfield"><textarea data-k="autoReplyText" rows="2" maxlength="200" aria-label="Текст автоответа">${esc(S.autoReplyText)}</textarea></div>` + radio("autoReplyWhen", "offline", "Когда меня нет в сети") + radio("autoReplyWhen", "always", "Всегда") : "")) +
+    sect("Помощник", tog("aiTranslate", "Перевод сообщений", "Пункт «Перевести» в меню сообщения") + tog("aiSummary", "Пересказ непрочитанного", "Короткое резюме длинных веток в группах"),
+      "Для перевода и пересказа текст сообщений уходит во внешнюю модель. Пока обе функции выключены, tgx никуда его не отправляет.") +
+    sect("Скрипты и плагины", "", "Появятся позже.") }
+});
+const chatsPage = PAGES.chats.h;
+PAGES.chats.h = () => chatsPage() + sect("Плотность", tog("compact", "Компактный режим", "Мелкие аватары и плотные сообщения: на экране помещается больше"));
+
+let expT = null;
+Object.assign(ACT, {
+  dl(a) {
+    const d = DL.find(x => x.id === +a.dataset.id), k = a.dataset.a; if (!d) return;
+    if (k === "pause") { d.st = "paused"; d.rate = 0; }
+    else if (k === "resume" || k === "first") { const room = k === "first" || dlActive().length < +S.dlParallel; d.st = room ? "active" : "queued"; d.rate = room ? d.base : 0; }
+    else if (k === "cancel") DL.splice(DL.indexOf(d), 1);
+    else if (k === "open") { toast("Папка Загрузки\\tgx откроется в Проводнике"); return; }
+    renderPage(true); renderStatus();
+  },
+  dlClear() { for (let i = DL.length - 1; i >= 0; i--) if (DL[i].st === "done") DL.splice(i, 1); renderPage(true); },
+  probe() { state.probing = true; renderPage(true); setTimeout(() => { state.probing = false; if (onPage("diag")) renderPage(true); toast("Маршруты проверены: WS 48 мс, MTProxy 112 мс"); }, 1200); },
+  copyDiag() { toast("Отчёт скопирован. Секреты прокси и номер телефона в него не входят"); },
+  jClear() { (state.jtab === "deleted" ? JDEL : JED).length = 0; if (state.jtab === "deleted") S.deletedCount = 0; renderPage(); },
+  goMsg(a) { closeModal(); openChat(a.dataset.id, a.dataset.mid ? +a.dataset.mid : null); },
+  exportRun() {
+    state.exp = 0; renderPage(true); clearInterval(expT);
+    expT = setInterval(() => {
+      state.exp = Math.min(100, state.exp + 6);
+      const bar = $("#expbar"), txt = $("#exptxt");
+      if (bar) { bar.style.setProperty("--p", state.exp); txt.textContent = `Экспорт: ${state.exp}%`; }
+      if (state.exp >= 100) { clearInterval(expT); state.exp = null; if (onPage("export")) renderPage(true); toast("Экспорт сохранён в Документы\\tgx\\export"); }
+    }, 300);
+  },
+  exportStop() { clearInterval(expT); state.exp = null; renderPage(true); toast("Экспорт остановлен, неполные файлы удалены"); },
+  pcStart() { state.pc = { step: 1 }; renderPage(); $("#pcin input").focus(); },
+  pcOff() { S.pass = ""; renderPage(); toast("Код-пароль выключен, база расшифрована"); },
+  lockNow() { lockApp(); },
+  updCheck() { state.upd = "checking"; renderPage(true); setTimeout(() => { state.upd = "found"; if (onPage("about")) renderPage(true); }, 1300); },
+  updInstall() { state.upd = "latest"; renderPage(true); toast("В макете перезапуск не выполняется"); },
+  callTo(a) { const c = CH.find(x => x.type === "private" && x.title === a.dataset.n); if (!c) { toast("Этого контакта нет в списке чатов макета"); return; } closeModal(); openChat(c.id); startCall(c, "out"); }
+});
+mbody.addEventListener("click", e => { const t = e.target.closest("[data-jt]"); if (t) { state.jtab = t.dataset.jt; renderPage(); } });
+
+/* four-digit inputs: passcode setup and lock screen */
+function pinHandlers(host, sel, done) {
+  host.addEventListener("input", e => {
+    const box = e.target.closest(sel); if (!box) return;
+    const ins = $$("input", box), i = ins.indexOf(e.target);
+    e.target.value = e.target.value.replace(/\D/g, "");
+    if (e.target.value && ins[i + 1]) ins[i + 1].focus();
+    if (ins.every(x => x.value)) done(ins.map(x => x.value).join(""), box);
+  });
+  host.addEventListener("keydown", e => {
+    const box = e.target.closest(sel); if (!box || e.key !== "Backspace" || e.target.value) return;
+    const ins = $$("input", box), i = ins.indexOf(e.target); if (ins[i - 1]) ins[i - 1].focus();
+  });
+}
+pinHandlers(mbody, "#pcin", code => {
+  if (state.pc.step === 1) state.pc = { step: 2, first: code };
+  else if (code === state.pc.first) { S.pass = code; state.pc = null; toast("Код-пароль задан"); }
+  else state.pc = { step: 1, err: "Коды не совпали. Задайте код заново" };
+  renderPage(); const f = $("#pcin input"); f && f.focus();
+});
+function lockHTML() {
+  return `<div class="lcard"><div class="mark">tgx</div><h2>tgx заблокирован</h2><p>Введите код-пароль, чтобы открыть чаты.</p><div class="pins">${'<input maxlength="1" inputmode="numeric" type="password" autocomplete="off" aria-label="Цифра кода">'.repeat(4)}</div><div class="lerr" data-lockerr></div>${S.hello ? `<button class="btn" data-lk="hello">Войти через Windows Hello</button>` : ""}<div class="lroute">${S.pass === "0000" ? "в макете код 0000. " : ""}Пока окно заблокировано, уведомления приходят без текста.</div></div>`;
+}
+function lockApp() {
+  if (!state.loggedIn) return;
+  if (!S.pass) { openSettings("passcode"); toast("Сначала задайте код-пароль"); return; }
+  state.locked = true; closeModal(); closeDrawer(); closeSearch(); viewer.hidden = true; ctx.hidden = true; pause();
+  lock.innerHTML = lockHTML(); lock.hidden = false; $("#wtitle").textContent = "заблокировано"; $(".pins input", lock).focus();
+}
+function unlock() { state.locked = false; lock.hidden = true; lock.innerHTML = ""; renderHeader(); }
+pinHandlers(lock, ".pins", (code, box) => {
+  if (code === S.pass) { unlock(); return; }
+  $("[data-lockerr]", lock).textContent = "Неверный код";
+  box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake");
+  $$("input", box).forEach(x => x.value = ""); $("input", box).focus();
+});
+lock.addEventListener("click", e => { if (e.target.closest("[data-lk=hello]")) { unlock(); toast("Windows Hello: личность подтверждена"); } });
+
+/* ---------- global search ---------- */
+const SP = { q: "", type: "all", scope: "all", re: false, sel: 0, hits: [], err: "", ms: 0 };
+const SPT = [["all", "Всё"], ["chats", "Чаты"], ["text", "Сообщения"], ["photo", "Фото"], ["file", "Файлы"], ["voice", "Голосовые"], ["link", "Ссылки"]];
+const RECENT = ["спайк", "договор", "DC2"];
+const msgType = m => { const k = m.kind || "text"; return k === "text" ? (m.lp || /https?:\/\//.test(m.text || "") ? "link" : "text") : ["photo", "album", "chart"].includes(k) ? "photo" : k === "file" ? "file" : ["voice", "circle"].includes(k) ? "voice" : "other"; };
+const msgText = m => [m.text, m.file && m.file.name, m.tr, m.lp && m.lp.title, m.poll && m.poll.q].filter(Boolean).join(" · ").replace(/\*\*|`/g, "").replace(/\n/g, " ");
+function runSearch() {
+  const t0 = performance.now(), q = SP.q.trim(), browse = !["all", "chats"].includes(SP.type); let match = null, err = "";
+  if (q && SP.re) { try { const re = new RegExp(q, "iu"); match = t => { const m = re.exec(t); return m && m[0] ? [m.index, m[0].length] : null; }; } catch (e) { err = e.message; } }
+  else if (q) { const lq = q.toLowerCase(); match = t => { const i = t.toLowerCase().indexOf(lq); return i < 0 ? null : [i, lq.length]; }; }
+  const hits = [];
+  if (!err && (match || browse)) {
+    const pool = SP.scope === "cur" ? [cur()] : sorted();
+    if (match && SP.scope === "all" && !browse) pool.forEach(c => { const r = match(c.title); if (r) hits.push({ c, r }); });
+    if (SP.type !== "chats") pool.forEach(c => {
+      let day = ""; const found = [];
+      c.msgs.forEach(m => {
+        if (m.day) { day = m.day; return; } if (!isReal(m)) return;
+        if (SP.type === "text" ? (m.kind || "text") !== "text" : browse && SP.type !== msgType(m)) return;
+        const t = msgText(m) || kindLabel(m), r = match ? match(t) : [0, 0]; if (r) found.push({ c, m, t, r, day });
+      });
+      hits.push(...found.reverse());
+    });
+  }
+  Object.assign(SP, { hits: hits.slice(0, 80), err, ms: performance.now() - t0 }); SP.sel = Math.min(SP.sel, Math.max(0, SP.hits.length - 1));
+}
+function renderSearch() {
+  runSearch();
+  $("#spf").innerHTML = SPT.map(([k, l]) => `<button class="chip ${SP.type === k ? "on" : ""}" data-spt="${k}">${l}</button>`).join("") +
+    `<select id="spscope" aria-label="Где искать"><option value="all">Во всех чатах</option><option value="cur" ${SP.scope === "cur" ? "selected" : ""}>В чате «${esc(cur().title)}»</option></select>`;
+  $("#spre").classList.toggle("on", SP.re); $("#spre").setAttribute("aria-pressed", SP.re); $("#spq").classList.toggle("re", SP.re);
+  const hl = (t, r, pre = 24, post = 80) => { const from = Math.max(0, r[0] - pre); return (from ? "…" : "") + esc(t.slice(from, r[0])) + (r[1] ? `<span class="hit">${esc(t.slice(r[0], r[0] + r[1]))}</span>` : "") + esc(t.slice(r[0] + r[1], r[0] + r[1] + post)); };
+  let h = "", sec = "";
+  if (SP.err) h = `<div class="sp-none err">Ошибка в выражении: ${esc(SP.err)}</div>`;
+  else if (!SP.hits.length) h = SP.q.trim() || !["all", "chats"].includes(SP.type) ? `<div class="sp-none">Ничего не найдено. Поиск идёт по локальной копии истории, включая сохранённые удалённые сообщения.</div>`
+    : `<div class="lsec">Недавние запросы</div>` + RECENT.map(r => `<div class="sp-row" data-recent="${esc(r)}"><span class="ib">${ic("history")}</span><div class="cmid">${esc(r)}</div></div>`).join("") +
+      `<div class="sp-none">Ищет по тексту, именам файлов и расшифровкам голосовых. Кнопка .* включает регулярные выражения.</div>`;
+  else h = SP.hits.map((x, i) => {
+    const s = x.m ? "Сообщения" : "Чаты", head = s !== sec ? `<div class="lsec">${sec = s}</div>` : "", cls = `sp-row ${i === SP.sel ? "sel" : ""}`;
+    if (!x.m) return head + `<div class="${cls}" data-i="${i}">${avaHTML(x.c, 36)}<div class="cmid"><div class="t1"><span class="tt">${hl(x.c.title, x.r, 99, 99)}</span></div><div class="t2">${statusText(x.c)}</div></div></div>`;
+    const who = x.m.out && x.c.type !== "channel" ? "Вы" : x.c.type === "group" ? x.m.from : "";
+    return head + `<div class="${cls}" data-i="${i}">${avaHTML(x.c, 36)}<div class="cmid"><div class="t1"><span class="tt">${esc(x.c.title)}${who ? `<small>${esc(who)}</small>` : ""}</span></div><div class="t2">${x.m.deleted ? '<em style="color:var(--bad)">удалено</em> ' : ""}${hl(x.t, x.r)}</div></div><span class="when">${x.day === TODAY ? x.m.t : (DAYSHORT[x.day] || x.day) + " " + x.m.t}</span></div>`;
+  }).join("");
+  $("#spres").innerHTML = h;
+  const total = CH.reduce((a, c) => a + c.msgs.filter(isReal).length, 0);
+  $("#spstat").textContent = SP.err ? "выражение не разобрано" : `${SP.hits.length ? SP.hits.length + " найдено, " : ""}локальный индекс: ${num(total)} ${plural(total, "сообщение", "сообщения", "сообщений")}, ${SP.ms.toFixed(1).replace(".", ",")} мс`;
+  const s = $(".sp-row.sel", spw); s && s.scrollIntoView({ block: "nearest" });
+}
+function openSearch(q) {
+  if (!state.loggedIn || state.locked) return;
+  closeDrawer(); closeModal(); ctx.hidden = true;
+  if (typeof q === "string") SP.q = q; SP.sel = 0;
+  spw.innerHTML = `<div class="sp" role="dialog" aria-label="Поиск по истории"><div class="sp-in">${ic("search")}<input id="spq" placeholder="Поиск по всей истории" autocomplete="off" spellcheck="false" aria-label="Запрос"><button class="sp-re" id="spre" title="Регулярное выражение">.*</button><kbd>Esc</kbd></div><div class="sp-f" id="spf"></div><div class="sp-res" id="spres"></div><div class="sp-foot"><span>↑↓ выбрать</span><span>Enter открыть</span><span class="r" id="spstat"></span></div></div>`;
+  spw.hidden = false; $("#spq").value = SP.q; renderSearch(); $("#spq").focus(); $("#spq").select();
+}
+function closeSearch() { spw.hidden = true; spw.innerHTML = ""; }
+function openHit(i) {
+  const x = SP.hits[i], q = SP.q.trim(); if (!x) return;
+  if (q && !RECENT.includes(q)) { RECENT.unshift(q); RECENT.length = Math.min(RECENT.length, 5); }
+  closeSearch(); openChat(x.c.id, x.m ? x.m.id : null);
+}
+spw.addEventListener("mousedown", e => { if (e.target === spw) closeSearch(); });
+spw.addEventListener("input", e => { if (e.target.id === "spq") { SP.q = e.target.value; SP.sel = 0; renderSearch(); } });
+spw.addEventListener("change", e => { if (e.target.id === "spscope") { SP.scope = e.target.value; SP.sel = 0; renderSearch(); $("#spq").focus(); } });
+spw.addEventListener("click", e => {
+  const t = e.target.closest("[data-spt]"); if (t) { SP.type = t.dataset.spt; SP.sel = 0; renderSearch(); $("#spq").focus(); return; }
+  if (e.target.closest("#spre")) { SP.re = !SP.re; renderSearch(); $("#spq").focus(); return; }
+  const rc = e.target.closest("[data-recent]"); if (rc) { SP.q = $("#spq").value = rc.dataset.recent; renderSearch(); $("#spq").focus(); return; }
+  const r = e.target.closest("[data-i]"); if (r) openHit(+r.dataset.i);
+});
+spw.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); if (!SP.hits.length) return; SP.sel = (SP.sel + (e.key === "ArrowDown" ? 1 : -1) + SP.hits.length) % SP.hits.length; renderSearch(); }
+  else if (e.key === "Enter" && SP.hits.length) { e.preventDefault(); openHit(SP.sel); }
+});
+$("#qk").addEventListener("click", () => openSearch($("#q").value));
+
+/* ---------- calls ---------- */
+let call = null;
+function callHTML(k) {
+  const c = k.c;
+  if (k.min) return `<button class="callpill" data-c="max" title="Развернуть звонок">${ic("phone")}${esc(c.title)}<span data-callt>${k.st === "active" ? fmtDur(k.t) : "вызов…"}</span></button>`;
+  const b = (a, i, t, cls = "") => `<button class="cbtn ${cls}" data-c="${a}" title="${t}" aria-label="${t}">${ic(i)}</button>`;
+  const stt = { ringing: "входящий звонок", calling: "вызов…", connecting: "обмен ключами…", active: `<span data-callt>${fmtDur(k.t)}</span>` }[k.st];
+  const ctl = k.st === "ringing" ? b("end", "phone", "Отклонить", "end") + b("take", "phone", "Принять", "take")
+    : b("mic", k.mic ? "mic" : "micoff", k.mic ? "Выключить микрофон" : "Включить микрофон", k.mic ? "" : "on") + b("cam", "video", k.cam ? "Выключить камеру" : "Включить камеру", k.cam ? "on" : "") + b("screen", "device", "Показать экран") + b("end", "phone", "Завершить", "end");
+  return `<div class="call ${k.st === "ringing" || k.st === "calling" ? "ringing" : ""}" data-theme="dark" role="dialog" aria-label="Звонок"><div class="call-top"><span><span class="dot ${k.st === "active" ? "ok" : "warn"}"></span>${k.st === "active" ? "через сервер Telegram, 64 мс" : k.st === "ringing" ? "личный звонок" : "соединение"}</span><button class="ib" data-c="min" title="Свернуть">${ic("down")}</button></div>
+    <div class="call-ava">${avaHTML({ ...c, online: false }, 96)}</div><div class="call-n">${esc(c.title)}</div><div class="call-s">${stt}</div>
+    ${k.st === "active" ? `<div class="call-key" title="Сравните с собеседником: если значки совпадают, звонок защищён">🐈 ⚡ 🌙 ☕<small>ключ шифрования звонка</small></div>` : ""}<div class="call-ctl">${ctl}</div></div>`;
+}
+function renderCall() { callbox.innerHTML = call ? callHTML(call) : ""; }
+function startCall(c, dir) {
+  if (!c || c.type !== "private") { toast("Звонки доступны в личных чатах"); return; }
+  endCall(true);
+  call = { c, dir, st: dir === "in" ? "ringing" : "calling", t: 0, mic: true, cam: false, min: false };
+  if (dir !== "in") call.timer = setTimeout(() => { call.st = "connecting"; renderCall(); call.timer = setTimeout(answerCall, 1200); }, 1800);
+  renderCall();
+}
+function answerCall() {
+  if (!call) return; clearTimeout(call.timer); call.st = "active";
+  call.timer = setInterval(() => { call.t++; const el = $("[data-callt]", callbox); if (el) el.textContent = fmtDur(call.t); }, 1000);
+  renderCall();
+}
+function endCall(silent) {
+  if (!call) return; clearTimeout(call.timer); clearInterval(call.timer);
+  const k = call; call = null; renderCall(); if (silent) return;
+  CALLS.unshift([k.c.title, k.st === "ringing" ? "missed" : k.dir === "in" ? "in" : "out", "сегодня в " + nowT(), k.st === "active" ? fmtDur(k.t) : k.st === "ringing" ? "отклонён" : "отменён"]);
+  toast(k.st === "active" ? `Звонок завершён, ${fmtDur(k.t)}` : k.st === "ringing" ? "Звонок отклонён" : "Звонок отменён");
+}
+callbox.addEventListener("click", e => {
+  const b = e.target.closest("[data-c]"); if (!b || !call) return;
+  const a = b.dataset.c;
+  if (a === "end") { endCall(); return; }
+  if (a === "take") { answerCall(); return; }
+  if (a === "min") call.min = true; else if (a === "max") call.min = false; else if (a === "mic") call.mic = !call.mic; else if (a === "cam") call.cam = !call.cam;
+  else if (a === "screen") toast("Выбор окна для показа откроется системным диалогом");
+  renderCall();
+});
+
+/* ---------- offline state ---------- */
+let netT = null;
+function renderNetban() {
+  const el = $("#netban"); if (!el) return;
+  el.innerHTML = state.conn === "offline" ? `<div class="netban" role="status"><span>Нет сети. Повтор через ${state.netRetry} с</span><button class="sbtn" data-retry>Повторить</button></div>` : "";
+}
+function reconnect() { clearInterval(netT); connect(); renderStatus(); }
+function setOffline() {
+  state.conn = "offline"; clearTimeout(connT); clearInterval(netT); state.netRetry = 9;
+  netT = setInterval(() => { if (state.conn !== "offline") { clearInterval(netT); return; } if (--state.netRetry <= 0) reconnect(); else renderNetban(); }, 1000);
+  renderStatus(); toast("Сообщения, отправленные без сети, уйдут после подключения");
+}
+function flushPending() {
+  let n = 0;
+  CH.forEach(c => c.msgs.forEach(m => { if (m.pending) { delete m.pending; n++; afterSend(c, m); } }));
+  if (n) { renderConv("keep"); restoreScroll(); }
+}
+$("#netban").addEventListener("click", e => { if (e.target.closest("[data-retry]")) reconnect(); });
+
+/* ---------- once a second: ping history and download progress ---------- */
+setInterval(() => {
+  const base = { ws: 48, proxy: 112, direct: 61, none: 0 }[activeRoute()];
+  pingHist.push(state.conn === "ready" && base ? Math.round(base + (Math.random() - .4) * 14 + (Math.random() > .95 ? 50 : 0)) : 0); pingHist.shift();
+  if (onPage("diag")) { const sb = $("#sparkbox"), pv = $("#pingv"); if (sb) sb.innerHTML = sparkSVG(pingHist); if (pv) pv.textContent = pingHist[59] || "—"; }
+  if (state.conn !== "ready") return;
+  const act = dlActive(), cap = +S.dlLimit || Infinity; let structural = false;
+  act.forEach(d => {
+    d.rate = Math.min(d.base * (.8 + Math.random() * .4), cap / act.length); d.done = Math.min(d.size, d.done + d.rate);
+    if (d.done >= d.size) { d.st = "done"; d.rate = 0; structural = true; toast(`Загружено: ${d.name}`); }
+  });
+  const free = +S.dlParallel - dlActive().length;
+  if (free > 0) DL.filter(d => d.st === "queued").slice(0, free).forEach(d => { d.st = "active"; d.rate = d.base; structural = true; });
+  if (onPage("downloads")) {
+    if (structural) renderPage(true);
+    else dlActive().forEach(d => { const el = $(`.dl[data-id="${d.id}"]`, mbody); if (!el) return; $(".prog i", el).style.setProperty("--p", (d.done * 100 / d.size).toFixed(1)); $(".dsub", el).innerHTML = dlSub(d); });
+  }
+  const sd = $("[data-st=downloads]", statusEl);
+  if (structural || !sd !== !dlActive().length) renderStatus(); else if (sd) sd.textContent = dlStatusText();
+}, 1000);
+
+/* ---------- hotkeys ---------- */
+function hotkey(e) {
+  if (document.body.dataset.view === "ds" || state.locked || !state.loggedIn) return false;
+  const mod = e.ctrlKey || e.metaKey, k = e.code;
+  const run = fn => { e.preventDefault(); fn(); return true; };
+  if (mod && k === "KeyK") return run(() => spw.hidden ? openSearch() : closeSearch());
+  if (!spw.hidden) return false;
+  if (mod && k === "KeyF") return run(() => { closeModal(); state.csearch = true; renderHeader(); });
+  if (mod && k === "Comma") return run(() => openSettings("main"));
+  if (mod && k === "KeyJ") return run(() => openSettings("downloads"));
+  if (mod && k === "KeyL") return run(lockApp);
+  if (e.altKey && (e.key === "ArrowDown" || e.key === "ArrowUp")) return run(() => {
+    const l = sorted().filter(c => inFolder(c, state.folder)), i = l.findIndex(c => c.id === state.chat), n = l[(i + (e.key === "ArrowDown" ? 1 : -1) + l.length) % l.length];
+    if (n) openChat(n.id);
+  });
+  return false;
+}
+
+/* ---------- page controls: view switch, theme, jump to screen ---------- */
+const JUMP = [
+  ["login:phone", "Вход: телефон"], ["login:code", "Вход: код"], ["login:pass", "Вход: облачный пароль"], ["login:qr", "Вход: QR-код"],
+  ["lock", "Экран блокировки"], ["search", "Поиск по истории"], ["call:out", "Звонок: исходящий"], ["call:in", "Звонок: входящий"],
+  ["drawer", "Меню и аккаунты"], ["offline", "Состояние: нет сети"], ["compact", "Компактный режим"],
+  ["set:main", "Настройки"], ["set:connection", "Подключение"], ["set:diag", "Диагностика сети"], ["set:downloads", "Загрузки"], ["set:journal", "Удалённые и правки"],
+  ["set:bookmarks", "Закладки"], ["set:export", "Экспорт и резервные копии"], ["set:passcode", "Код-пароль"], ["set:ghost", "Призрачный режим"],
+  ["set:hotkeys", "Горячие клавиши"], ["set:automation", "Автоматизация"], ["set:devices", "Устройства"], ["set:about", "О программе и обновления"]
+];
+function setView(v, anchor) {
+  document.body.dataset.view = v === "ds" ? "ds" : "proto";
+  $$("#viewseg button").forEach(b => b.classList.toggle("on", b.dataset.view === document.body.dataset.view));
+  if (v !== "ds") return;
+  renderDS();
+  const a = anchor && $("#ds-" + anchor); if (a) a.scrollIntoView();
+}
+function jump(a) {
+  const [k, v] = a.split(":");
+  setView("proto"); closeModal(); closeDrawer(); closeSearch(); viewer.hidden = true; ctx.hidden = true;
+  if (state.locked && k !== "lock") unlock();
+  if (k !== "login" && !state.loggedIn) { state.loggedIn = true; login.hidden = true; connect(); renderStatus(); renderAll(); }
+  if (k === "login") { pause(); endCall(true); state.loggedIn = false; renderLogin(v); }
+  else if (k === "lock") { S.pass = S.pass || "0000"; lockApp(); }
+  else if (k === "search") openSearch("спайк");
+  else if (k === "call") startCall(chatOf("anton") || CH.find(c => c.type === "private"), v);
+  else if (k === "drawer") { state.accOpen = true; openDrawer(); }
+  else if (k === "offline") setOffline();
+  else if (k === "compact") { S.compact = !S.compact; applySettings(); toast(S.compact ? "Компактный режим включён" : "Компактный режим выключен"); }
+  else if (k === "set") openSettings(v);
+}
+$("#jump").innerHTML = `<option value="">Перейти к экрану…</option>` + JUMP.map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
+$("#jump").addEventListener("change", e => { const v = e.target.value; e.target.value = ""; e.target.blur(); if (v) jump(v); });
+$("#viewseg").addEventListener("click", e => { const b = e.target.closest("[data-view]"); if (b) setView(b.dataset.view); });
+$("#themeT").addEventListener("click", () => { S.theme = root.dataset.theme === "dark" ? "light" : "dark"; applySettings(); });
+
+/* ====================================================================
+   Design system view. Specimens are built with the same render functions
+   as the prototype, token values are read back from the live CSS.
+   ==================================================================== */
+const TOKENS = [
+  ["win", "Основная поверхность: шапки, окна настроек, меню"], ["pane", "Список чатов, статус-бар, подложка между группами настроек"], ["rail", "Колонка папок"],
+  ["chat", "Фон переписки"], ["in", "Входящее сообщение, поля ввода"], ["out", "Исходящее сообщение: акцент поверх --in, 13 % в светлой теме и 22 % в тёмной"], ["sel", "Наведение и выделенная строка"],
+  ["line", "Границы и разделители, всегда 1 px"], ["text", "Основной текст"], ["muted", "Вторичный текст, время, подписи"], ["faint", "Значки состояния, плейсхолдеры, неактивное. Не для текста"],
+  ["accent", "Действие, выбранный чат, ссылки, свои галочки"], ["accent-ink", "Текст и значки на акценте"], ["accent-soft", "Цитаты, превью ссылок, реакции"],
+  ["ok", "Соединение готово"], ["warn", "Подключение, предупреждение о прямом маршруте"], ["bad", "Ошибка, удаление, нет маршрута"]
+];
+const PAIRS = [
+  ["text", "win", "Основной текст"], ["text", "in", "Текст входящего сообщения"], ["text", "out", "Текст исходящего сообщения"], ["muted", "win", "Вторичный текст"],
+  ["muted", "pane", "Превью в списке чатов"], ["muted", "sel", "Вторичный текст на выделенной строке"], ["accent", "win", "Ссылки и акцентные подписи"],
+  ["accent", "accent-soft", "Имя в цитате"], ["accent-ink", "accent", "Текст на акценте"], ["ok", "pane", "Статус «готово»"], ["warn", "pane", "Статус «подключение»"],
+  ["bad", "win", "Ошибка и удаление"], ["faint", "win", "Значки и неактивное, не текст"]
+];
+function cssToHex(c) {
+  let m = c.match(/^rgba?\(([^)]+)\)/), v;
+  if (m) v = m[1].split(/[ ,/]+/).slice(0, 3).map(Number);
+  else if ((m = c.match(/^color\(srgb ([^)]+)\)/))) v = m[1].split(/[ /]+/).slice(0, 3).map(x => parseFloat(x) * 255);
+  else return c;
+  return "#" + v.map(x => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, "0")).join("");
+}
+function resolveTokens(theme) {
+  const p = document.createElement("div"); p.dataset.theme = theme; p.style.cssText = "position:absolute;visibility:hidden;width:0;height:0;transition:none !important";
+  document.body.appendChild(p);
+  const out = {}; TOKENS.forEach(([n]) => { p.style.backgroundColor = `var(--${n})`; out[n] = cssToHex(getComputedStyle(p).backgroundColor); });
+  p.remove(); return out;
+}
+function contrast(a, b) {
+  const L = h => { const [r, g, bl] = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * r + .7152 * g + .0722 * bl; };
+  const x = L(a), y = L(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05);
+}
+const SCREENS = [
+  ["Вход: телефон, код, облачный пароль", "MVP", "login:phone"], ["Вход по QR-коду", "MVP, по возможности", "login:qr"], ["Список чатов, переписка, текст и фото, ответы", "MVP", ""],
+  ["Подключение: режим и порядок маршрутов, свои прокси", "MVP", "set:connection"], ["Статус-бар с цепочкой маршрутов", "MVP", ""], ["Состояние «нет сети» и отложенная отправка", "MVP", "offline"],
+  ["Голосовые, кружки, файлы, стикеры, реакции, опросы", "M1", ""], ["Уведомления Windows", "M1", "set:notify"], ["Загрузки: очередь, пауза, ошибки", "M1", "set:downloads"],
+  ["Энергосбережение и режим трея", "M1", "set:power"], ["Диагностика сети и обход блокировок", "M2", "set:diag"], ["Призрачный режим", "M3", "set:ghost"],
+  ["Удалённые сообщения и история правок", "M3", "set:journal"], ["Несколько аккаунтов", "M3", "drawer"], ["Код-пароль и экран блокировки", "M3", "lock"],
+  ["Поиск по всей истории", "M4", "search"], ["Закладки и заметки о контактах", "M4", "set:bookmarks"], ["Экспорт и резервные копии", "M4", "set:export"],
+  ["Тема, акцент, компактный режим, папки", "M5", "set:chats"], ["Горячие клавиши", "M5", "set:hotkeys"], ["Автоответ, перевод, пересказ", "M5", "set:automation"],
+  ["Звонки", "M6", "call:out"], ["Обновления с проверкой подписи", "M6", "set:about"]
+];
+function renderDS() {
+  const top = dsEl.scrollTop, L = resolveTokens("light"), Dk = resolveTokens("dark");
+  const spec = (body, cap, cls = "") => `<div class="spec"><div class="spec-b ${cls}">${body}</div><div class="spec-c">${cap}</div></div>`;
+  const sec = (id, title, lead, body) => `<section class="ds-sec" id="ds-${id}"><h2>${title}</h2>${lead ? `<p>${lead}</p>` : ""}${body}</section>`;
+  const P = { type: "private", title: "Антон Ковалёв" }, G = { type: "group", title: "Рабочая группа" }, N = { type: "channel", title: "Сетевые заметки" };
+  let sid = 0;
+  const rows = (c, list) => list.map(m => rowHTML({ id: "s" + sid++, ...m }, c, { first: true, last: true })).join("");
+  const stat = (dot, label, chain, rest = "", right = "") => `<footer class="status"><span><span class="dot ${dot}"></span><b>${label}</b></span><span class="chain">${chain}</span>${rest}<span class="r">${right}</span></footer>`;
+  const hops = (on, dis = ["direct"]) => ["WS", "MTProxy", "direct"].map(h => `<span class="hop ${h === on ? "cur" : dis.includes(h) ? "dis" : ""}">${h}</span>`).join('<span class="arr">→</span>');
+  const badge = r => r >= 4.5 ? `<span class="pass">AA</span>` : r >= 3 ? `<span class="pass mid">3:1</span>` : `<span class="pass no">декор</span>`;
+  const sw = h => `<i class="swt" style="background:${h}"></i>`;
+  const NAV = [["principles", "Принципы"], ["color", "Цвет"], ["type", "Типографика"], ["layout", "Окно и размеры"], ["icons", "Значки"], ["controls", "Элементы управления"], ["list", "Список чатов"], ["messages", "Сообщения"], ["composer", "Поле ввода"], ["overlays", "Меню и окна"], ["status", "Статус-бар"], ["states", "Состояния"], ["motion", "Движение"], ["keys", "Клавиатура"], ["a11y", "Доступность"], ["map", "Карта экранов"]];
+
+  const principles = `<section class="ds-sec" id="ds-principles"><h2 class="ds-lead">Клиент, который показывает, как он подключён</h2>
+    <p>tgx — личный клиент Telegram для Windows со встроенным обходом блокировок. Интерфейс собран вокруг одной идеи: человек всегда видит, каким путём идут его данные и что хранится только на его компьютере.</p>
+    <ul class="prin"><li><b>Маршрут всегда на виду</b>Статус-бар показывает цепочку маршрутов и активное звено. Прямое подключение помечено предупреждением. Тихих откатов нет: если маршрут запрещён, интерфейс честно пишет «нет маршрута».</li>
+    <li><b>Технические факты набраны моноширинным</b>Адреса, задержки, дата-центры, размеры и журналы — Cascadia Mono. Всё остальное — Segoe UI. Сразу видно, где данные сети, а где интерфейс.</li>
+    <li><b>Тихий и дешёвый в отрисовке</b>Один акцентный цвет, тёплые серые поверхности, без градиентов, размытий и декоративной анимации. Системные шрифты: ничего не грузится при запуске.</li>
+    <li><b>Локальное подписано</b>Удалённые сообщения, история правок, заметки и закладки существуют только на этом компьютере, и каждая такая вещь говорит об этом прямо.</li></ul></section>`;
+
+  const color = sec("color", "Цвет", "Палитра построена на тёплых серых и одном акценте. Значения читаются из действующих стилей, поэтому таблица не расходится с макетом.",
+    `<table class="tk"><tr><th>Токен</th><th>Светлая</th><th>Тёмная</th><th>Где используется</th></tr>${TOKENS.map(([n, d]) => `<tr><td><code>--${n}</code></td><td class="num">${sw(L[n])}${L[n]}</td><td class="num">${sw(Dk[n])}${Dk[n]}</td><td>${d}</td></tr>`).join("")}</table>
+    <h3>Акцент на выбор</h3><table class="tk"><tr><th>Название</th><th>Светлая тема</th><th>Тёмная тема</th><th></th></tr>${Object.entries(ACC).map(([k, v]) => `<tr><td>${v[2]}</td><td class="num">${sw(v[0])}${v[0]}</td><td class="num">${sw(v[1])}${v[1]}</td><td>${k === S.accent ? "выбран сейчас" : ""}</td></tr>`).join("")}</table>
+    <h3>Аватары без фотографии</h3>${spec(PALC.map(c => `<div class="ava" style="--s:40px;background:${c}">АК</div>`).join(""), "Цвет выбирается по хешу имени. Девять приглушённых тонов одной светлоты, белые инициалы")}`);
+
+  const TYPE = [
+    ["Заголовок экрана входа", "22 / 600", "font-size:22px;font-weight:600", "Код подтверждения"], ["Имя в профиле", "17 / 600", "font-size:17px;font-weight:600", "Антон Ковалёв"],
+    ["Заголовок окна настроек", "16 / 600", "font-size:16px;font-weight:600", "Подключение"], ["Поле ввода", "15 / 400", "font-size:15px", "916 000-00-00"],
+    ["Сообщения и основной текст", "14 / 1.4 / 400, меняется 12–18", "font-size:14px", "Холодный старт у меня 1.1 с, было 1.9"], ["Название чата, имя отправителя", "14 и 13 / 600", "font-weight:600", "Рабочая группа"],
+    ["Превью, подписи, пояснения", "13 / 400, --muted", "font-size:13px;color:var(--muted)", "Собеседник не увидит двух галочек"], ["Время в списке, счётчики, даты", "12 / 400", "font-size:12px;color:var(--muted)", "14:32 · 9 ноября"],
+    ["Время в сообщении, подписи папок", "11 / 400", "font-size:11px;color:var(--muted)", "изм. 14:05"], ["Статус-бар, маршруты, журнал", "12 mono", "font:12px var(--mono);color:var(--muted)", "kws2.web.telegram.org · DC2 · 48 ms"],
+    ["Код подтверждения, задержка", "24–34 mono / 600", "font:600 24px var(--mono)", "48 мс"]
+  ];
+  const type = sec("type", "Типографика", "Два системных семейства: Segoe UI Variable Text для интерфейса и Cascadia Mono для данных сети. Запасные — Segoe UI и Consolas. Шрифты не поставляются с приложением.",
+    `<table class="tk"><tr><th>Роль</th><th>Размер / насыщенность</th><th>Образец</th></tr>${TYPE.map(([r, s, st, x]) => `<tr><td>${r}</td><td class="num">${s}</td><td><div class="tsample" style="${st}">${x}</div></td></tr>`).join("")}</table>`);
+
+  const DIM = [["Заголовок окна", "32"], ["Колонка папок", "68, в компактном режиме 52"], ["Список чатов", "310, в компактном 280"], ["Шапка чата", "54, в компактном 46"], ["Панель информации", "320"], ["Статус-бар", "26"],
+    ["Минимальное окно", "1060 × 620"], ["Окно настроек", "470 × до 680"], ["Поиск по истории", "720"], ["Боковое меню", "290"], ["Сообщение", "не шире 540 и 76 % колонки"], ["Строка настроек", "не ниже 44"], ["Кнопка-значок", "34 × 34"]];
+  const layout = sec("layout", "Окно и размеры", "Одно окно, три постоянные колонки и статус-бар. Панель информации открывается четвёртой колонкой и сжимает переписку, а не перекрывает её.",
+    `<div class="anat"><div class="a-t">заголовок окна · 32</div><div class="a-rail"><b>папки</b>68</div><div class="a-list"><b>список чатов</b>310</div><div class="a-conv"><b>переписка</b>остаток, шапка 54</div><div><b>информация</b>320, по запросу</div><div class="a-s">статус-бар · 26 · моноширинный</div></div>
+    <div class="grid2" style="margin-top:14px"><table class="tk"><tr><th>Часть</th><th>Размер, px</th></tr>${DIM.map(([a, b]) => `<tr><td>${a}</td><td class="num">${b}</td></tr>`).join("")}</table>
+    <div><h3 style="margin-top:0">Отступы</h3><div class="scale">${[2, 4, 6, 8, 10, 12, 16, 18, 24].map(n => `<div><i style="width:${n}px;height:${n}px"></i>${n}</div>`).join("")}</div>
+    <h3>Скругления</h3><div class="scale">${[[3, "метки"], [6, "кнопки, поля"], [8, "тосты"], [10, "сообщения, меню"], [12, "окна"]].map(([n, l]) => `<div class="rad"><i style="border-radius:${n}px"></i>${n} · ${l}</div>`).join("")}</div>
+    <h3>Слои</h3><table class="tk">${[["Боковое меню", "20–21"], ["Окно настроек", "30"], ["Поиск", "32"], ["Вход", "35"], ["Просмотр фото", "40"], ["Звонок и уведомление", "44–45"], ["Контекстное меню", "50"], ["Экран блокировки", "70"]].map(([a, b]) => `<tr><td>${a}</td><td class="num">${b}</td></tr>`).join("")}</table>
+    <p class="snote" style="margin:10px 0 0">Тень одна на всё плавающее: <code style="font:12px var(--mono)">--shadow</code>. Плоские поверхности разделяет линия, а не тень.</p></div></div>`);
+
+  const icons = sec("icons", "Значки", "Сетка 18 × 18, линия 1,5 px, скруглённые концы и стыки, без заливки. В интерфейсе значок рисуется в 18 px, в колонке папок — 22 px.",
+    `<div class="icons">${Object.keys(I).map(n => `<div>${ic(n)}${n}</div>`).join("")}</div>`);
+
+  const controls = sec("controls", "Элементы управления", "", `<div class="grid2">
+    ${spec(`<div style="width:170px"><button class="btn primary" style="margin:0">Получить код</button></div><div style="width:170px"><button class="btn" style="margin:0">Войти по номеру</button></div>`, ".btn.primary, .btn · высота 40, радиус 6 · главное действие экрана")}
+    ${spec(`<button class="sbtn pri">Добавить</button><button class="sbtn">Проверить</button><button class="sbtn" disabled style="opacity:.5">Недоступно</button>`, ".sbtn.pri, .sbtn · действия внутри строки настроек")}
+    ${spec(`<button class="ib" title="Поиск">${ic("search")}</button><button class="ib" style="background:var(--sel);color:var(--text)">${ic("info")}</button><button class="sendb">${ic("send")}</button><button class="vplay">${ic("play", "ipl")}</button><button class="cbtn">${ic("mic")}</button><button class="cbtn end">${ic("phone")}</button>`, ".ib 34 (обычная, под курсором) · .sendb 36 · .vplay 42 · .cbtn 48")}
+    ${spec(`<button class="chip on">Всё</button><button class="chip">Чаты</button><button class="chip">Файлы</button><button class="sp-re on">.*</button><button class="sp-re">.*</button>`, ".chip, .sp-re · фильтры поиска, включённое состояние")}
+    ${spec(`<label class="field" style="width:200px">Номер<input class="mono" value="916 000-00-00"></label><label class="field" style="width:200px">Пароль<input type="password" value="12345678"></label>`, ".field · подпись 12, поле 15, рамка 1 px, в фокусе рамка акцентом")}
+    ${spec(`<div class="code">${["4", "8", "2", "", ""].map(v => `<input value="${v}" maxlength="1" aria-label="Цифра">`).join("")}</div>`, ".code · 54 × 58, mono 24 · код из Telegram, фокус сам переходит дальше")}
+    ${spec(`<div class="sfield" style="width:100%;padding:0"><input value="denfry" aria-label="Имя"><div class="cnt">58</div></div>`, ".sfield · поле в настройках: только нижняя линия, счётчик справа")}
+    ${spec(`<div class="pxform" style="width:100%;padding:0"><label>Тип<select><option>MTProxy</option></select></label><label>Сервер<input value="proxy.example.net"></label><label>Порт<input value="443"></label></div>`, ".pxform · технические поля набраны моноширинным")}
+    ${spec(tog("anims", "Анимации интерфейса", "Пояснение под названием") + row("net", "Подключение", "WebSocket", "x") + radio("sendKey", "enter", "Enter", "Shift+Enter — новая строка") + act("danger", "Выйти", "", "logout"), ".srow · строка настроек: переключатель, переход, выбор, опасное действие", "col")}
+    ${spec(`<span class="badge">3</span><span class="badge mut">148</span><span><span class="dot ok"></span>готово</span><span><span class="dot warn"></span>подключение</span><span><span class="dot bad"></span>ошибка</span><span><span class="dot off"></span>выключен</span><span class="tag">призрак</span><span class="tag warn">видно провайдеру</span><span class="hop cur">WS</span><kbd>Ctrl</kbd><kbd>K</kbd>`, ".badge · .dot · .tag · .hop · kbd")}
+    ${spec([34, 40, 46, 56, 68].map(s => avaName("Оля Смирнова", s)).join("") + `<div class="ava on" style="--s:46px;background:${PALC[1]}">АК</div>` + avaHTML({ type: "saved" }, 46), ".ava · 34 сообщение, 40 строка, 46 список, 56 меню, 68–96 профиль · зелёная точка «в сети»")}
+    ${spec(`<div style="width:100%;display:grid;gap:10px"><div class="prog"><i style="--p:64"></i></div><div class="store" style="margin:0">${S.store.map(s => `<i style="width:${s[1] / 12}%;background:${s[2]}"></i>`).join("")}</div><div class="srange" style="padding:0"><input type="range" min="12" max="18" value="14" aria-label="Размер текста"><span>14 px</span></div></div>`, ".prog 4 px · .store 10 px · .srange")}
+  </div>`);
+
+  const list = sec("list", "Список чатов", "Строка 60 px: аватар 46, название, одна строка превью, справа время и счётчик. Выбранный чат залит акцентом целиком.",
+    `<div class="grid2">${spec([citemHTML(chatOf("work") || CH[0], true), citemHTML(chatOf("anton") || CH[1], false), citemHTML(chatOf("rust") || CH[2], false), citemHTML({ ...(chatOf("sveta") || CH[3]), typing: true }, false), citemHTML({ ...(chatOf("pavel") || CH[4]), draft: "завтра напишу подробнее" }, false), citemHTML(chatOf("saved") || CH[0], false)].join(""), "выбран · непрочитанные · без звука · печатает · черновик · закреплён", "panebg")}
+    ${spec(`<div class="lhead"><div class="lq"><input placeholder="Поиск" aria-label="Поиск"><kbd>Ctrl K</kbd></div><div class="netban"><span>Нет сети. Повтор через 6 с</span><button class="sbtn">Повторить</button></div></div><div class="skel"><i class="av"></i><span><i style="width:55%"></i><i style="width:85%"></i></span></div><div class="skel"><i class="av"></i><span><i style="width:40%"></i><i style="width:70%"></i></span></div><div class="lempty">Ничего не найдено</div>`, "поле поиска с подсказкой · баннер «нет сети» · заглушка первой загрузки · пустой результат", "panebg")}</div>`);
+
+  const messages = sec("messages", "Сообщения", "Входящие слева на --in, исходящие справа на --out. Первый пузырь в серии получает острый угол со стороны автора. Время стоит в правом нижнем углу и не занимает отдельную строку.",
+    `<div class="grid2">
+    ${spec(rows(P, [T(null, "Привет! Ты в четверг свободен?", "13:20"), O("Привет. Смотря когда, до обеда созвоны", "13:31"), O("отправлено, не прочитано", "13:32", { read: false }), O("уйдёт, когда появится сеть", "13:33", { read: false, pending: true })]), "входящее · прочитано · доставлено · ждёт сети", "chatbg")}
+    ${spec(rows(G, [T("Игорь Дегтярёв", "А память после двух минут простоя сколько?", "14:06"), O("Всю. Один DC напрямую — это утечка", "14:24", { reply: { from: "Игорь Дегтярёв", text: "Голосовое сообщение" } }), T("Оля Смирнова", "Маршрут в статус-баре теперь показывает DC: `WS · DC2`", "14:32", { reactions: [{ e: "🔥", n: 3, me: true }, { e: "👀", n: 1 }] })]), "группа: имя и аватар автора · ответ с цитатой · реакции", "chatbg")}
+    ${spec(rows(P, [T(null, "адрес скину ближе к делу", "14:05", { edited: true, edits: [["14:05", "a"]] }), T(null, "Поправка: на стенде пока старая сборка", "14:07", { deleted: "14:11" }), O("разобрать pool.py перед реализацией", "16:12", { bm: true, fwd: "Избранное", lp: { site: "GitHub", title: "Flowseal/tg-ws-proxy", desc: "Локальный MTProto-прокси поверх WebSocket" } })]), "изменено, история по щелчку · удалено, копия локальная · закладка, пересылка, превью ссылки", "chatbg")}
+    ${spec(rows(N, [T(null, "Провайдеры режут UDP на 443 порту у трёх операторов.", "10:20", { views: "4,1K", comments: 12, edited: true })]) + `<div class="day"><span>9 ноября</span></div><div class="svc"><span>Оля Смирнова закрепила сообщение</span></div><div class="unread-sep">Непрочитанные сообщения</div>`, "пост канала: просмотры, обсуждение · дата · служебное · разделитель непрочитанных", "chatbg")}
+    ${spec(rows(P, [T(null, "с дачи, последние в этом году", "12:10", { kind: "photo", seed: 8 }), O("", "13:44", { kind: "voice", dur: 8, seed: 5, tr: "Давай после обеда, часа в три." })]), "фото с подписью, 340 px · голосовое: волна, скорость, расшифровка", "chatbg")}
+    ${spec(rows(P, [T(null, "", "13:40", { kind: "circle", dur: 12, seed: 3 }), O("", "13:44", { kind: "sticker", st: 1 })]), "видеосообщение 220 px, при воспроизведении 300 · стикер 160", "chatbg")}
+    ${spec(rows(G, [T("Марат Хасанов", "", "14:27", { kind: "file", file: { name: "spike-report.pdf", size: "1.3 МБ", ext: "PDF" } }), T("Марат Хасанов", "", "14:27", { kind: "file", fstate: "loading", file: { name: "build-log.txt", size: "640 КБ", ext: "TXT" } }), O("", "14:28", { kind: "file", fstate: "done", file: { name: "Договор.docx", size: "84 КБ", ext: "DOC" } })]), "файл: скачать · загружается · открыть", "chatbg")}
+    ${spec(rows(G, [T("Марат Хасанов", "", "14:28", { kind: "poll", poll: { q: "Когда созвон по спайку?", opts: [["Среда, 11:00", 3], ["Четверг, 15:00", 2]], voted: 0 } }), T("Погода", "Москва, сейчас +4°, дождь", "14:30", { kb: [["Сегодня", "Завтра"], ["Сменить город"]] })]), "опрос после голосования · кнопки бота под сообщением", "chatbg")}
+    </div>`);
+
+  const composer = sec("composer", "Поле ввода", "Одна строка, растёт до 160 px. Кнопка справа меняется: микрофон, пока поле пустое, и отправка, когда есть текст.",
+    `<div class="grid2">
+    ${spec(`<div class="composer"><button class="ib">${ic("attach")}</button><textarea rows="1" placeholder="Сообщение" readonly aria-label="Сообщение"></textarea><button class="ib">${ic("smile")}</button><button class="recb ib">${ic("mic")}</button></div>`, "пусто: прикрепить, эмодзи, запись голоса", "col")}
+    ${spec(`<div class="replybar">${ic("reply")}<div class="quote"><b>Игорь Дегтярёв</b><span>А память после двух минут простоя сколько?</span></div><button class="ib">${ic("close")}</button></div><div class="composer"><button class="ib">${ic("attach")}</button><textarea rows="1" readonly aria-label="Сообщение">Мерил на своём аккаунте: 94 МБ</textarea><button class="ib">${ic("smile")}</button><button class="sendb">${ic("send")}</button></div>`, "ответ на сообщение и набранный текст", "col")}
+    ${spec(`<div class="composer recording" style="padding-right:22px"><div class="recbar"><i class="rdot"></i><span class="rtime">0:07,4</span><span class="rhint">Отпустите — отправить · Esc — отмена</span></div><button class="recb ib">${ic("mic")}</button></div>`, "запись: таймер, подсказка, увеличенная кнопка", "col")}
+    ${spec(`<div class="chanbar"><button>Отключить уведомления</button></div>`, "канал: вместо поля ввода одно действие", "col")}</div>`);
+
+  const overlays = sec("overlays", "Меню и окна", "Всё плавающее лежит на --win с рамкой 1 px и общей тенью. Опасные пункты красные и стоят последними.",
+    `<div class="grid3">
+    ${spec(`<div class="ctx"><div class="rx">${REACT.map(r => `<button>${r}</button>`).join("")}</div>${[["reply", "Ответить"], ["copy", "Копировать текст"], ["fwd", "Переслать в Избранное"], ["pin", "Закрепить"], ["bookmark", "В закладки"]].map(([i, l]) => `<button class="ci">${ic(i)}${l}</button>`).join("")}<button class="ci danger">${ic("trash")}Удалить</button></div>`, ".ctx · меню сообщения с реакциями")}
+    ${spec(`<div class="ctx"><button class="ci">${ic("chats")}Открыть tgx</button><button class="ci off">${ic("net")}WS, DC2, 48 мс</button><button class="ci">${ic("mute")}Не беспокоить час</button><button class="ci">${ic("lock")}Заблокировать</button><button class="ci danger">${ic("logout")}Закрыть tgx</button></div>`, "меню значка в трее: маршрут виден и здесь")}
+    ${spec(`<div class="ctx"><h5>История правок, хранится локально</h5><div class="ver"><small>14:05</small>адрес скину завтра утром</div><div class="ver"><small>14:06 · текущая</small>адрес скину ближе к делу</div></div>`, "история правок по щелчку на «изм.»")}
+    ${spec(`<div class="wtoast" style="width:100%"><div class="wa"><span>tgx</span><span>сейчас</span></div>${avaName("Света Лебедева", 40)}<b>Света Лебедева</b><span>и ещё пункт 6.1 — там про залог</span></div>`, ".wtoast · уведомление о сообщении, 330 px")}
+    ${spec(`<div class="toast show">Сохранено в Загрузки\\tgx</div>`, ".toast · короткое подтверждение, 2,2 с")}
+    ${spec(callHTML({ c: { type: "private", title: "Антон Ковалёв", ini: "АК", col: "#8a6a4a" }, st: "active", t: 134, mic: true, cam: false }), ".call · всегда тёмная, 320 px · строка о пути звука")}
+    </div>`);
+
+  const status = sec("status", "Статус-бар", "Главный элемент продукта. Слева состояние, затем цепочка маршрутов с подсвеченным активным звеном, адрес и дата-центр, метки, справа задержка. Щелчок открывает настройки подключения.",
+    `<div class="grid1">
+    ${spec(stat("ok", "готово", hops("WS"), "<span>kws2.web.telegram.org · DC2</span>", "48 ms"), "авторежим: WS активен, прямой маршрут выключен и зачёркнут", "col")}
+    ${spec(stat("warn", "подключение…", hops("MTProxy"), "<span>proxy.example.net:443 · DC2</span>"), "WS не ответил, идёт переход на второй маршрут", "col")}
+    ${spec(stat("ok", "готово", hops("direct", []), '<span>149.154.167.51 · DC2</span><span class="tag warn">видно провайдеру</span>', "61 ms"), "прямое подключение всегда с предупреждением", "col")}
+    ${spec(stat("bad", "нет маршрута", '<span class="hop dis">только WS</span>'), "принудительный режим: отката нет, связь честно отсутствует", "col")}
+    ${spec(stat("ok", "готово", hops("WS"), '<span>kws2.web.telegram.org · DC2</span><span class="tag">призрак</span><span>↓ 2 · 2.3 MB/s</span>', "48 ms"), "метка призрачного режима и идущие загрузки", "col")}
+    ${spec(stat("bad", "нет сети", hops("")), "сети нет совсем: ни одно звено не активно", "col")}</div>`);
+
+  const D0 = { id: 0, name: "tdlib-1.8.51-win-x64.zip", ext: "ZIP", size: 48, done: 31.4, chat: "Рабочая группа", rate: 1.4, base: 1.4, err: "связь оборвалась на DC4" };
+  const states = sec("states", "Состояния", "Ошибка говорит, что случилось и что можно сделать. Пустой экран подсказывает первое действие.",
+    `<div class="grid2">
+    ${spec(["active", "paused", "error", "queued", "done"].map(st => dlRow({ ...D0, st, done: st === "done" ? 48 : st === "queued" ? 0 : 31.4, rate: st === "active" ? 1.4 : 0 })).join(""), ".dl · идёт · пауза · ошибка · в очереди · готово", "col")}
+    ${spec(`<div style="padding:8px 0">${dcTable()}</div>${netLog()}`, ".dct и .log · задержка по дата-центрам и журнал переключений", "col")}
+    ${spec(jDelRow(JDEL[0] || { id: "", chat: "Чат", from: "Автор", text: "Текст", sent: "сегодня", del: "14:11" }) + jEdRow(JED[0] || { id: "", chat: "Чат", from: "Чат", a: "было так", b: "стало так", at: "сегодня" }), ".jr · удалённое сообщение и правка: убранное зачёркнуто, добавленное подсвечено", "col")}
+    ${spec(`<div class="lock" style="position:relative;height:330px">${lockHTML()}</div>`, ".lock · экран блокировки закрывает всё окно", "col")}
+    ${spec(`<div class="inone">Закладок пока нет. Щёлкните правой кнопкой по сообщению и выберите «В закладки».</div>`, "пустой экран называет следующее действие", "col")}
+    ${spec(`<div class="sp-none err">Ошибка в выражении: Unterminated group</div><div class="lerr" style="padding:0 16px 14px">Проверьте номер: нужно 10 цифр</div>`, "ошибка ввода: рядом с полем, без извинений", "col")}</div>`);
+
+  const motion = sec("motion", "Движение", "Анимация только отвечает на действие. Переключатель «Анимации интерфейса» и системная настройка «уменьшить движение» выключают её полностью.",
+    `<table class="tk"><tr><th>Что</th><th>Длительность</th><th>Как</th></tr>${[["Переключатель, фон под курсором", "150 мс", "смена цвета и положения"], ["Боковое меню, панель информации, тост", "200 мс", "сдвиг и проявление"], ["Уведомление о сообщении, кружок при запуске", "250 мс", "въезд снизу, рост с 220 до 300 px"], ["Поле с ошибкой", "300 мс", "короткое покачивание по горизонтали"], ["Полоса загрузки, результат опроса", "400–500 мс", "рост ширины"], ["Сообщение, к которому перешли", "1,4 с", "обводка акцентом, затем гаснет"], ["«Печатает», запись, входящий звонок", "пока длится", "мигание точек, кольцо вокруг аватара 1,6 с"]].map(r => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td>${r[2]}</td></tr>`).join("")}</table>`);
+
+  const keys = sec("keys", "Клавиатура", "Всё основное доступно без мыши. Esc всегда закрывает самый верхний слой.",
+    `<div class="grid3">${KEYS.map(([t, r]) => `<div class="spec"><div class="spec-b col" style="padding:6px 0"><h3 style="margin:8px 18px 4px">${t}</h3>${r.map(([l, k]) => `<div class="keys"><span>${l}</span><span>${k.includes(" ") && !/[а-я]/.test(k) ? k.split(" ").map(x => `<kbd>${x}</kbd>`).join("") : `<kbd>${k}</kbd>`}</span></div>`).join("")}</div></div>`).join("")}</div>`);
+
+  const a11y = sec("a11y", "Доступность", "Контраст считается по формуле WCAG из действующих цветов. Текст должен набирать 4,5:1, значки и границы элементов — 3:1.",
+    `<table class="tk"><tr><th>Пара</th><th>Назначение</th><th>Светлая</th><th>Тёмная</th></tr>${PAIRS.map(([a, b, d]) => { const r1 = contrast(L[a], L[b]), r2 = contrast(Dk[a], Dk[b]); return `<tr><td><code>--${a}</code> на <code>--${b}</code></td><td>${d}</td><td class="num">${sw(L[b])}${r1.toFixed(1)}:1 ${badge(r1)}</td><td class="num">${sw(Dk[b])}${r2.toFixed(1)}:1 ${badge(r2)}</td></tr>`; }).join("")}</table>
+    <div class="grid3" style="margin-top:14px">${spec(`<button class="sbtn" style="outline:2px solid var(--accent);outline-offset:1px">Проверить</button><button class="ib" style="outline:2px solid var(--accent);outline-offset:1px">${ic("search")}</button>`, "фокус с клавиатуры: обводка 2 px акцентом, отступ 1 px")}
+    ${spec(`<span><span class="dot ok"></span>готово</span><span><span class="dot bad"></span>нет маршрута</span><span class="tag warn">видно провайдеру</span>`, "состояние всегда продублировано словом, не только цветом")}
+    ${spec(`<span style="font-size:12px">12</span><span style="font-size:14px">14</span><span style="font-size:18px">18</span>`, "размер текста сообщений меняется от 12 до 18 px")}</div>`);
+
+  const map = sec("map", "Карта экранов", "Все экраны прототипа и этап, на котором они появляются в приложении. Ссылка открывает экран в прототипе.",
+    `<table class="tk"><tr><th>Экран</th><th>Этап</th><th></th></tr>${SCREENS.map(([n, m, a]) => `<tr><td>${n}</td><td class="num">${m}</td><td>${a ? `<button class="mapbtn" data-jump="${a}">Открыть</button>` : "основное окно"}</td></tr>`).join("")}</table>`);
+
+  dsEl.innerHTML = `<div class="ds-in"><nav class="ds-nav" aria-label="Разделы">${NAV.map(([id, l]) => `<a href="#" data-ds="${id}">${l}</a>`).join("")}</nav><div>${principles}${color}${type}${layout}${icons}${controls}${list}${messages}${composer}${overlays}${status}${states}${motion}${keys}${a11y}${map}</div></div>`;
+  dsEl.scrollTop = top;
+}
+dsEl.addEventListener("click", e => {
+  const a = e.target.closest("[data-ds]"); if (a) { e.preventDefault(); const s = $("#ds-" + a.dataset.ds); s && s.scrollIntoView(); return; }
+  const j = e.target.closest("[data-jump]"); if (j) jump(j.dataset.jump);
+});
 
 /* ---------- init ---------- */
 (function init() {
@@ -1738,6 +2660,12 @@ function scheduleLife() {
   if (h.has("login")) { state.loggedIn = false; renderLogin(h.get("login") || "phone"); }
   if (h.get("settings")) openSettings(h.get("settings"));
   if (h.has("drawer")) openDrawer();
+  if (h.has("search")) openSearch(h.get("search") || "");
+  if (h.has("lock")) { S.pass = S.pass || "0000"; lockApp(); }
+  if (h.get("call")) startCall(chatOf("anton"), h.get("call"));
+  if (h.has("offline")) setOffline();
+  if (h.has("compact")) { S.compact = true; applySettings(); }
+  if (h.has("ds")) setView("ds", h.get("ds"));
   scheduleLife();
 })();
 </script>
