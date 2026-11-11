@@ -1,0 +1,72 @@
+import { ListView } from "std-widgets.slint";
+
+export struct Msg {
+    text: string,
+    outgoing: bool,
+    time: string,
+    has_photo: bool,
+}
+
+export component ListWindow inherits Window {
+    title: "tgx slint-list spike";
+    width: 900px;
+    height: 700px;
+    background: #0e1621;
+
+    in property <[Msg]> messages;
+    in-out property <length> scroll-y <=> list.content-y;
+    out property <length> content-height: list.content-height;
+    out property <length> visible-height: list.visible-height;
+    callback near-top();
+
+    list := ListView {
+        width: parent.width;
+        height: parent.height;
+
+        changed content-y => {
+            if (-self.content-y < 200px) {
+                root.near-top();
+            }
+        }
+
+        for m in root.messages: Rectangle {
+            HorizontalLayout {
+                alignment: m.outgoing ? end : start;
+                padding-left: 12px;
+                padding-right: 12px;
+                padding-top: 3px;
+                padding-bottom: 3px;
+
+                Rectangle {
+                    max-width: list.visible-width * 0.6;
+                    background: m.outgoing ? #2b5278 : #182533;
+                    border-radius: 12px;
+
+                    VerticalLayout {
+                        padding: 8px;
+                        spacing: 4px;
+
+                        if m.has_photo: Rectangle {
+                            width: 240px;
+                            height: 160px;
+                            border-radius: 8px;
+                            background: #3a4b5c;
+                        }
+                        Text {
+                            text: m.text;
+                            wrap: word-wrap;
+                            color: #e9eef3;
+                            font-size: 14px;
+                        }
+                        Text {
+                            text: m.time;
+                            color: #8899aa;
+                            font-size: 11px;
+                            horizontal-alignment: right;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
