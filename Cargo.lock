@@ -493,6 +493,7 @@ version = "0.1.0"
 dependencies = [
  "aes",
  "ctr",
+ "futures-util",
  "rand",
  "rustls",
  "sha2",

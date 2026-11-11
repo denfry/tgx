@@ -150,10 +150,20 @@ pub fn generate_relay_init(proto: ProtoTag, dc_idx: i16) -> [u8; HANDSHAKE_LEN] 
 
 /// The four AES-256-CTR streams of one relayed connection.
 pub struct CryptoCtx {
+    up: UpCipher,
+    down: DownCipher,
+}
+
+/// Client -> Telegram direction (`clt_dec` then `tg_enc`).
+pub struct UpCipher {
     clt_dec: Ctr,
-    clt_enc: Ctr,
     tg_enc: Ctr,
+}
+
+/// Telegram -> client direction (`tg_dec` then `clt_enc`).
+pub struct DownCipher {
     tg_dec: Ctr,
+    clt_enc: Ctr,
 }
 
 impl CryptoCtx {
@@ -171,13 +181,28 @@ impl CryptoCtx {
         let tg_dec = cipher(&r[..PREKEY_LEN], &r[PREKEY_LEN..]);
 
         CryptoCtx {
-            clt_dec,
-            clt_enc,
-            tg_enc,
-            tg_dec,
+            up: UpCipher { clt_dec, tg_enc },
+            down: DownCipher { tg_dec, clt_enc },
         }
     }
 
+    /// See [`UpCipher::client_to_tg`].
+    pub fn client_to_tg(&mut self, buf: &mut [u8]) -> Vec<u8> {
+        self.up.client_to_tg(buf)
+    }
+
+    /// See [`DownCipher::tg_to_client`].
+    pub fn tg_to_client(&mut self, buf: &mut [u8]) {
+        self.down.tg_to_client(buf)
+    }
+
+    /// Splits into independent per-direction halves for concurrent copying.
+    pub fn split(self) -> (UpCipher, DownCipher) {
+        (self.up, self.down)
+    }
+}
+
+impl UpCipher {
     /// Decrypts client bytes in place (leaving plaintext in `buf`, which the
     /// packet splitter inspects) and returns them re-encrypted for Telegram.
     pub fn client_to_tg(&mut self, buf: &mut [u8]) -> Vec<u8> {
@@ -186,7 +211,9 @@ impl CryptoCtx {
         self.tg_enc.apply_keystream(&mut out);
         out
     }
+}
 
+impl DownCipher {
     /// Re-encrypts Telegram bytes for the client, in place.
     pub fn tg_to_client(&mut self, buf: &mut [u8]) {
         self.tg_dec.apply_keystream(buf);

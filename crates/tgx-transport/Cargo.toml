@@ -8,6 +8,7 @@ publish.workspace = true
 [dependencies]
 aes = "0.9.4"
 ctr = "0.10.1"
+futures-util = { version = "0.3.34", default-features = false, features = ["sink", "std"] }
 rand = "0.10.3"
 # Direct dep only to select the `ring` crypto provider for tokio-tungstenite.
 rustls = { version = "0.23.46", default-features = false, features = ["ring", "std", "tls12", "logging"] }
@@ -15,3 +16,6 @@ sha2 = "0.11.1"
 thiserror = "2.0.21"
 tokio = { version = "1.54.1", features = ["full"] }
 tokio-tungstenite = { version = "0.30.0", features = ["rustls-tls-webpki-roots"] }
+
+[dev-dependencies]
+tokio = { version = "1.54.1", features = ["full", "test-util"] }
