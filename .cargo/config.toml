@@ -1,0 +1,4 @@
+# rustc overflows its default stack (STATUS_STACK_BUFFER_OVERRUN on Windows)
+# compiling tdlib-rs's generated TDLib API; give it a larger one.
+[env]
+RUST_MIN_STACK = "268435456"

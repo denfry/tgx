@@ -1,8 +1,11 @@
 [workspace]
 resolver = "3"
-members = ["crates/*"]
+members = ["crates/*", "spikes/*"]
 
 [workspace.package]
 edition = "2024"
-license = "MIT"
 publish = false
+
+# Dependency debuginfo (tdlib-rs, slint) costs gigabytes and is not needed.
+[profile.dev.package."*"]
+debug = false

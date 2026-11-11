@@ -48,7 +48,9 @@ impl WssDialer {
         }
     }
 
-    async fn dial_domain(
+    /// Dials one specific hostname over a socket to `addr` (used by `dial` and
+    /// by diagnostics that probe each endpoint separately).
+    pub async fn dial_domain(
         &self,
         addr: SocketAddr,
         domain: &str,
