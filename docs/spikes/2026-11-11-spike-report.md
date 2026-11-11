@@ -84,7 +84,10 @@ Verified without an account (dummy api_id, scratch data dir):
 - TDLib's connections arrive at the relay and decode to the right DC (`connected DC1`).
 - A fresh database starts on **DC1**. With the default table (DC 2/4 only) the relay reports
   `DC1 UNREACHABLE` and closes. It never falls back to a direct connection.
-- With `--ws-ip 1=149.154.175.50`, auth reaches `WaitPhoneNumber` over the relay.
+- With `--ws-ip 1=149.154.175.50`, TDLib's `pingProxy` (a real request/response with
+  Telegram) succeeded through the relay in **144 ms**: MTProto traffic flows end to end
+  over WSS. (`WaitPhoneNumber` is reached locally before any network traffic, so it is
+  not evidence on its own.)
 - TDLib queues proxy requests until `setTdlibParameters`. Awaiting `addProxy` first
   deadlocks, so `addProxy` is sent immediately before the parameters, and TDLib applies
   it first on init.

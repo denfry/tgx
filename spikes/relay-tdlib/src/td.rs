@@ -186,14 +186,28 @@ async fn configure_proxy(
             f::disable_proxy(client_id)
                 .await
                 .map_err(td_err("disableProxy"))?;
+            tokio::spawn(ping(None, client_id));
             return Ok(None);
         }
         (Route::Ws { .. }, None) => unreachable!("ws route always starts a relay"),
     };
+    tokio::spawn(ping(Some(proxy.clone()), client_id));
     let tdlib_rs::enums::AddedProxy::AddedProxy(added) = f::add_proxy(proxy, true, client_id)
         .await
         .map_err(td_err("addProxy"))?;
     Ok(Some(added.id))
+}
+
+/// One real request/response with Telegram over the route (TDLib `pingProxy`;
+/// `None` pings directly), proving traffic flows end to end before login.
+async fn ping(proxy: Option<Proxy>, client_id: i32) {
+    match f::ping_proxy(proxy, client_id).await {
+        Ok(tdlib_rs::enums::Seconds::Seconds(s)) => println!(
+            "pingProxy: Telegram answered in {:.0} ms",
+            s.seconds * 1000.0
+        ),
+        Err(e) => println!("pingProxy failed: {} {}", e.code, e.message),
+    }
 }
 
 /// Removes proxies left by earlier runs (the relay port changes every run).
