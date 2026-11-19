@@ -1,0 +1,43 @@
+// Theme tokens (UI design spec §2.1, §2.4). Every colour in the UI comes from here.
+// The defaults are the built-in "Дневная" / "Ночная" presets; the Rust side may
+// overwrite any token at run time (presets, user overrides, theme files).
+import { Palette } from "std-widgets.slint";
+
+export global Theme {
+    in-out property <bool> dark: Palette.color-scheme == ColorScheme.dark;
+
+    in-out property <color> win: dark ? #17212b : #ffffff;
+    in-out property <color> pane: dark ? #17212b : #ffffff;
+    in-out property <color> chat: dark ? #0e1621 : #cfdcc4;
+    in-out property <brush> wall: dark
+        ? @linear-gradient(160deg, #0f1b27 0%, #0c1620 55%, #111e2b 100%)
+        : @linear-gradient(140deg, #d4e5bf 0%, #b6d4bf 38%, #bcd5df 72%, #d8e2bb 100%);
+    in-out property <color> line: dark ? #0d141b : #e4e7ea;
+    in-out property <color> text: dark ? #f2f4f6 : #121417;
+    in-out property <color> muted: dark ? #7d8e9e : #6c7277;
+    in-out property <color> faint: dark ? #5f6f7e : #9aa1a7;
+    in-out property <color> sel: dark ? #202c38 : #f1f3f5;
+    in-out property <color> accent: dark ? #5aa9ec : #3a8ee6;
+    in-out property <color> accent-ink: #ffffff;
+    in-out property <color> sel-on: dark ? #2b5278 : accent;
+    in-out property <color> sel-on-ink: #ffffff;
+    in-out property <color> in-bubble: dark ? #182533 : #ffffff;
+    in-out property <color> out-bubble: dark ? #2b5278 : #e2f6d1;
+    in-out property <color> in-meta: dark ? #6d7f8f : #8b9298;
+    in-out property <color> out-meta: dark ? #86b5e0 : #3f9a45;
+    in-out property <color> chip-bg: dark ? #14202ccc : #304a3c61;
+    in-out property <color> chip-ink: dark ? #dfe7ee : #ffffff;
+    in-out property <color> ok: dark ? #5cc98a : #2e8a4f;
+    in-out property <color> warn: dark ? #e5aa4e : #9a6410;
+    in-out property <color> bad: dark ? #ec6f62 : #d0443a;
+
+    in-out property <length> r-bubble: 14px;
+    in-out property <bool> tails: true;
+    in-out property <length> msg-font: 14px;
+
+    // Avatar gradients (top, bottom), picked by a stable hash on the Rust side.
+    out property <[color]> ava-top: [#5ec3e8, #6fd08c, #4fd1b8, #7fa4f5, #a98ff0, #a6d65a, #f5c35a, #f08bc0, #ffa36b, #ff8a80, #a3acb6];
+    out property <[color]> ava-bottom: [#3a9fd0, #45b06a, #2fae96, #5a7fe0, #8467dc, #7fb63b, #e0a33a, #d9649f, #ec7f45, #e8615a, #7d8791];
+
+    out property <string> mono: "Cascadia Mono";
+}

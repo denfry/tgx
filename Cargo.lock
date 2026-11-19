@@ -5001,6 +5001,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f18aa187839b2bdb1ad2fa35ead8c4c2976b64e4363c386d45ac0f7ee85c9233"
 
 [[package]]
+name = "tgx"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "slint",
+ "slint-build",
+ "tdlib-rs",
+ "tgx-transport",
+ "tokio",
+]
+
+[[package]]
 name = "tgx-transport"
 version = "0.1.0"
 dependencies = [

@@ -1,0 +1,632 @@
+import { ScrollView } from "std-widgets.slint";
+import { Theme } from "theme.slint";
+
+export { Theme }
+
+export struct ChatRow {
+    key: string,
+    title: string,
+    prefix: string,
+    preview: string,
+    time: string,
+    unread: int,
+    muted: bool,
+    pinned: bool,
+    ini: string,
+    ava: int,
+    saved: bool,
+}
+
+// kind: 0 message, 1 date chip. state (outgoing only): 0 none, 1 pending, 2 sent, 3 read, 4 failed.
+export struct Msg {
+    kind: int,
+    out: bool,
+    text: string,
+    time: string,
+    sender: string,
+    sender-ini: string,
+    sender-ava: int,
+    first: bool,
+    last: bool,
+    state: int,
+}
+
+component Avatar inherits Rectangle {
+    in property <string> ini;
+    in property <int> ava;
+    in property <bool> saved;
+    in property <length> size: 50px;
+    width: size;
+    height: size;
+    border-radius: size / 2;
+    background: saved ? Theme.accent : @linear-gradient(180deg, Theme.ava-top[ava] 0%, Theme.ava-bottom[ava] 100%);
+    Text {
+        text: saved ? "★" : ini;
+        color: #ffffff;
+        font-size: size * 0.36;
+        font-weight: 600;
+    }
+}
+
+component Field inherits Rectangle {
+    in property <string> placeholder;
+    in property <bool> secret;
+    in property <InputType> type: secret ? InputType.password : InputType.text;
+    in-out property <string> value <=> input.text;
+    callback accepted(string);
+    height: 44px;
+    border-radius: 10px;
+    border-width: input.has-focus ? 2px : 1px;
+    border-color: input.has-focus ? Theme.accent : Theme.line;
+    background: Theme.win;
+    input := TextInput {
+        x: 14px;
+        width: parent.width - 28px;
+        vertical-alignment: center;
+        font-size: 16px;
+        color: Theme.text;
+        input-type: root.type;
+        single-line: true;
+        accepted => { root.accepted(self.text); }
+    }
+    if input.text == "": Text {
+        x: 14px;
+        text: root.placeholder;
+        color: Theme.faint;
+        font-size: 16px;
+        vertical-alignment: center;
+    }
+}
+
+component Button inherits Rectangle {
+    in property <string> label;
+    in property <bool> enabled: true;
+    callback clicked();
+    height: 44px;
+    border-radius: 10px;
+    background: !enabled ? Theme.faint : ta.pressed ? Theme.accent.darker(15%) : ta.has-hover ? Theme.accent.darker(6%) : Theme.accent;
+    Text {
+        text: root.label;
+        color: Theme.accent-ink;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    ta := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+component StatusBar inherits Rectangle {
+    in property <string> route;
+    in property <string> state;
+    in property <int> level;
+    in property <string> note;
+    height: 26px;
+    background: Theme.pane;
+    Rectangle { y: 0; height: 1px; background: Theme.line; }
+    HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 12px;
+        spacing: 8px;
+        alignment: start;
+        VerticalLayout {
+            alignment: center;
+            Rectangle {
+                width: 8px;
+                height: 8px;
+                border-radius: 4px;
+                background: level == 0 ? Theme.ok : level == 1 ? Theme.warn : Theme.bad;
+            }
+        }
+        Text { text: state; color: Theme.text; font-size: 12px; font-family: Theme.mono; vertical-alignment: center; }
+        Text { text: route; color: Theme.muted; font-size: 12px; font-family: Theme.mono; vertical-alignment: center; }
+        Text { text: note; color: Theme.warn; font-size: 12px; font-family: Theme.mono; vertical-alignment: center; }
+    }
+}
+
+component LoginView inherits Rectangle {
+    in property <string> step;
+    in property <string> error;
+    in property <bool> busy;
+    in property <string> hint;
+    in property <string> route-line;
+    callback submit(string);
+    background: Theme.wall;
+
+    Rectangle {
+        width: 380px;
+        height: card.preferred-height;
+        border-radius: 16px;
+        background: Theme.win;
+        drop-shadow-blur: 24px;
+        drop-shadow-color: #0000002e;
+        drop-shadow-offset-y: 6px;
+        card := VerticalLayout {
+            padding: 32px;
+            spacing: 14px;
+            Text {
+                text: "tgx";
+                font-size: 30px;
+                font-weight: 700;
+                color: Theme.accent;
+                horizontal-alignment: center;
+            }
+            Text {
+                text: step == "phone" ? "Вход в Telegram" : step == "code" ? "Код подтверждения" : step == "password" ? "Облачный пароль" : "Подключение…";
+                font-size: 22px;
+                font-weight: 600;
+                color: Theme.text;
+                horizontal-alignment: center;
+            }
+            Text {
+                text: step == "phone" ? "Номер телефона в международном формате, например +7 900 000-00-00"
+                    : step == "code" ? "Мы отправили код в Telegram на другом устройстве или по SMS"
+                    : step == "password" ? (hint == "" ? "На аккаунте включена двухэтапная проверка" : "Подсказка: " + hint)
+                    : "Соединяемся с Telegram через встроенный транспорт";
+                wrap: word-wrap;
+                font-size: 14px;
+                color: Theme.muted;
+                horizontal-alignment: center;
+            }
+            if step == "phone" || step == "code" || step == "password": VerticalLayout {
+                spacing: 14px;
+                field := Field {
+                    placeholder: step == "phone" ? "+7 900 000-00-00" : step == "code" ? "Код" : "Пароль";
+                    secret: step == "password";
+                    accepted(v) => { if (!root.busy && v != "") { root.submit(v); } }
+                }
+                if error != "": Text {
+                    text: error;
+                    color: Theme.bad;
+                    font-size: 13px;
+                    wrap: word-wrap;
+                }
+                Button {
+                    label: busy ? "Проверяем…" : "Продолжить";
+                    enabled: !busy && field.value != "";
+                    clicked => { root.submit(field.value); }
+                }
+            }
+            Text {
+                text: route-line;
+                font-size: 12px;
+                font-family: Theme.mono;
+                color: Theme.muted;
+                horizontal-alignment: center;
+            }
+        }
+    }
+}
+
+component ChatItem inherits Rectangle {
+    in property <ChatRow> data;
+    in property <bool> selected;
+    callback clicked();
+    height: 66px;
+    background: selected ? Theme.sel-on : ta.has-hover ? Theme.sel : transparent;
+    property <color> ink: selected ? Theme.sel-on-ink : Theme.text;
+    property <color> sub: selected ? Theme.sel-on-ink.with-alpha(0.85) : Theme.muted;
+    ta := TouchArea { clicked => { root.clicked(); } }
+    HorizontalLayout {
+        padding-left: 10px;
+        padding-right: 10px;
+        spacing: 11px;
+        VerticalLayout {
+            alignment: center;
+            Avatar {
+                size: 50px;
+                ini: data.ini;
+                ava: data.ava;
+                saved: data.saved;
+            }
+        }
+        VerticalLayout {
+            alignment: center;
+            spacing: 3px;
+            HorizontalLayout {
+                spacing: 6px;
+                Text {
+                    text: data.title;
+                    color: ink;
+                    font-size: 14px;
+                    font-weight: 600;
+                    overflow: elide;
+                    horizontal-stretch: 1;
+                }
+                Text {
+                    text: data.time;
+                    color: sub;
+                    font-size: 12px;
+                    horizontal-stretch: 0;
+                }
+            }
+            HorizontalLayout {
+                spacing: 6px;
+                Text {
+                    text: data.prefix == "" ? data.preview : data.prefix + ": " + data.preview;
+                    color: sub;
+                    font-size: 13px;
+                    overflow: elide;
+                    horizontal-stretch: 1;
+                }
+                if data.unread > 0: Rectangle {
+                    horizontal-stretch: 0;
+                    width: max(20px, badge.preferred-width + 12px);
+                    height: 20px;
+                    border-radius: 10px;
+                    background: selected ? Theme.sel-on-ink : data.muted ? Theme.muted : Theme.accent;
+                    badge := Text {
+                        text: data.unread > 999 ? "999+" : "\{data.unread}";
+                        color: selected ? Theme.sel-on : Theme.accent-ink;
+                        font-size: 12px;
+                        font-weight: 600;
+                    }
+                }
+            }
+        }
+    }
+}
+
+component Ticks inherits Text {
+    in property <int> state;
+    text: state == 1 ? "◷" : state == 2 ? "✓" : state == 3 ? "✓✓" : state == 4 ? "!" : "";
+    font-size: 12px;
+}
+
+component Bubble inherits HorizontalLayout {
+    in property <Msg> m;
+    in property <length> max-w;
+    in property <bool> group;
+    property <length> r: Theme.r-bubble;
+    property <length> small: Theme.r-bubble / 3;
+    property <bool> tail: Theme.tails && m.last;
+    property <color> bg: m.out ? Theme.out-bubble : Theme.in-bubble;
+    alignment: m.out ? end : start;
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-top: m.first ? 6px : 1px;
+    spacing: 6px;
+
+    if group && !m.out: Rectangle {
+        width: 34px;
+        if m.last: Avatar {
+            y: parent.height - self.height;
+            size: 34px;
+            ini: m.sender-ini;
+            ava: m.sender-ava;
+        }
+    }
+    Rectangle {
+        max-width: max-w;
+        // Tail: a small curved wedge outside the bubble's bottom corner.
+        if tail && !m.out: Path {
+            x: -8px;
+            y: parent.height - 17px;
+            width: 9px;
+            height: 17px;
+            viewbox-width: 9;
+            viewbox-height: 17;
+            commands: "M9 0 V17 H0 C3.2 15.6 5.5 13.4 7 10.4 C8.4 7.5 9 4 9 0 Z";
+            fill: bg;
+        }
+        if tail && m.out: Path {
+            x: parent.width - 1px;
+            y: parent.height - 17px;
+            width: 9px;
+            height: 17px;
+            viewbox-width: 9;
+            viewbox-height: 17;
+            commands: "M0 0 V17 H9 C5.8 15.6 3.5 13.4 2 10.4 C0.6 7.5 0 4 0 0 Z";
+            fill: bg;
+        }
+        Rectangle {
+            background: bg;
+            border-top-left-radius: !m.out && !m.first ? small : r;
+            border-bottom-left-radius: !m.out ? (tail ? 0px : m.last ? r : small) : r;
+            border-top-right-radius: m.out && !m.first ? small : r;
+            border-bottom-right-radius: m.out ? (tail ? 0px : m.last ? r : small) : r;
+            drop-shadow-blur: 1.5px;
+            drop-shadow-offset-y: 1px;
+            drop-shadow-color: Theme.dark ? #00000059 : #10232f24;
+            VerticalLayout {
+                padding-left: 11px;
+                padding-right: 11px;
+                padding-top: 6px;
+                padding-bottom: 6px;
+                spacing: 2px;
+                if group && !m.out && m.first && m.sender != "": Text {
+                    text: m.sender;
+                    color: Theme.ava-bottom[m.sender-ava];
+                    font-size: 13px;
+                    font-weight: 600;
+                }
+                Text {
+                    text: m.text;
+                    wrap: word-wrap;
+                    color: Theme.text;
+                    font-size: Theme.msg-font;
+                }
+                HorizontalLayout {
+                    alignment: end;
+                    spacing: 4px;
+                    Text {
+                        text: m.time;
+                        color: m.out ? Theme.out-meta : Theme.in-meta;
+                        font-size: 12px;
+                    }
+                    if m.out: Ticks {
+                        state: m.state;
+                        color: m.state == 4 ? Theme.bad : Theme.out-meta;
+                    }
+                }
+            }
+        }
+    }
+}
+
+component Conversation inherits Rectangle {
+    in property <string> title;
+    in property <string> subtitle;
+    in property <string> ini;
+    in property <int> ava;
+    in property <bool> saved;
+    in property <bool> group;
+    in property <[Msg]> messages;
+    in property <bool> has-chat;
+    callback send(string);
+    background: Theme.chat;
+
+    // Bumped by the app when a chat is opened: jump to the newest message.
+    in property <int> scroll-token;
+    changed scroll-token => {
+        history.stick = true;
+        history.content-y = min(0px, history.visible-height - history.content-height);
+        composer.focus();
+    }
+
+    VerticalLayout {
+        Rectangle {
+            height: 54px;
+            background: Theme.win;
+            HorizontalLayout {
+                padding-left: 16px;
+                padding-right: 16px;
+                spacing: 12px;
+                VerticalLayout {
+                    alignment: center;
+                    Avatar {
+                        size: 40px;
+                        ini: root.ini;
+                        ava: root.ava;
+                        saved: root.saved;
+                    }
+                }
+                VerticalLayout {
+                    alignment: center;
+                    Text { text: root.title; color: Theme.text; font-size: 14px; font-weight: 600; overflow: elide; }
+                    Text { text: root.subtitle; color: Theme.muted; font-size: 13px; overflow: elide; }
+                }
+            }
+            Rectangle { y: parent.height - 1px; height: 1px; background: Theme.line; }
+        }
+        Rectangle {
+            background: Theme.wall;
+            history := ScrollView {
+                // Follow new messages while the user is at the bottom.
+                in-out property <bool> stick: true;
+                changed content-height => {
+                    if (self.stick) {
+                        self.content-y = min(0px, self.visible-height - self.content-height);
+                    }
+                }
+                scrolled => {
+                    self.stick = self.content-y <= self.visible-height - self.content-height + 40px;
+                }
+                VerticalLayout {
+                    padding-top: 8px;
+                    padding-bottom: 10px;
+                    for m in root.messages: VerticalLayout {
+                        if m.kind == 1: HorizontalLayout {
+                            alignment: center;
+                            padding-top: 10px;
+                            padding-bottom: 4px;
+                            Rectangle {
+                                width: chip.preferred-width + 20px;
+                                height: 22px;
+                                border-radius: 11px;
+                                background: Theme.chip-bg;
+                                chip := Text { text: m.text; color: Theme.chip-ink; font-size: 13px; font-weight: 500; }
+                            }
+                        }
+                        if m.kind == 0: Bubble {
+                            m: m;
+                            group: root.group;
+                            max-w: min(540px, history.visible-width * 0.76);
+                        }
+                    }
+                }
+            }
+        }
+        Rectangle {
+            height: 52px;
+            background: Theme.win;
+            Rectangle { y: 0; height: 1px; background: Theme.line; }
+            HorizontalLayout {
+                padding-left: 18px;
+                padding-right: 10px;
+                spacing: 8px;
+                composer := TextInput {
+                    vertical-alignment: center;
+                    font-size: Theme.msg-font;
+                    color: Theme.text;
+                    single-line: true;
+                    accepted => {
+                        if (self.text != "") {
+                            root.send(self.text);
+                            self.text = "";
+                        }
+                    }
+                }
+                Rectangle {
+                    width: 40px;
+                    send-ta := TouchArea {
+                        mouse-cursor: pointer;
+                        clicked => {
+                            if (composer.text != "") {
+                                root.send(composer.text);
+                                composer.text = "";
+                                composer.focus();
+                            }
+                        }
+                    }
+                    Rectangle {
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 18px;
+                        background: composer.text == "" ? transparent : send-ta.has-hover ? Theme.accent.darker(6%) : Theme.accent;
+                        Text {
+                            text: "➤";
+                            font-size: 16px;
+                            color: composer.text == "" ? Theme.faint : Theme.accent-ink;
+                        }
+                    }
+                }
+            }
+            if composer.text == "": Text {
+                x: 18px;
+                text: "Сообщение";
+                color: Theme.faint;
+                font-size: Theme.msg-font;
+                vertical-alignment: center;
+            }
+        }
+    }
+    if !has-chat: Rectangle {
+        background: Theme.wall;
+        Rectangle {
+            width: hint.preferred-width + 24px;
+            height: 28px;
+            border-radius: 14px;
+            background: Theme.chip-bg;
+            hint := Text {
+                text: "Выберите чат, чтобы начать переписку";
+                color: Theme.chip-ink;
+                font-size: 13px;
+            }
+        }
+    }
+
+}
+
+export component AppWindow inherits Window {
+    title: "tgx";
+    preferred-width: 1200px;
+    preferred-height: 780px;
+    min-width: 900px;
+    min-height: 560px;
+    background: Theme.win;
+    default-font-family: "Segoe UI";
+
+    // loading | phone | code | password | main | fatal
+    in property <string> screen: "loading";
+    in property <string> login-error;
+    in property <bool> login-busy;
+    in property <string> password-hint;
+    in property <string> fatal-error;
+
+    in property <[ChatRow]> chats;
+    in-out property <string> selected-key;
+    in property <string> chat-title;
+    in property <string> chat-subtitle;
+    in property <string> chat-ini;
+    in property <int> chat-ava;
+    in property <bool> chat-saved;
+    in property <bool> chat-group;
+    in property <[Msg]> messages;
+
+    in property <string> conn-state: "подключение";
+    in property <int> conn-level: 1;
+    in property <string> route: "WS";
+    in property <string> route-note;
+
+    callback submit-login(string, string);
+    callback open-chat(string);
+    callback send(string);
+
+    in property <int> scroll-token;
+
+    VerticalLayout {
+        Rectangle {
+            vertical-stretch: 1;
+            if screen == "loading" || screen == "phone" || screen == "code" || screen == "password": LoginView {
+                step: screen;
+                error: root.login-error;
+                busy: root.login-busy;
+                hint: root.password-hint;
+                route-line: "маршрут: " + root.route + " · " + root.conn-state;
+                submit(v) => { root.submit-login(root.screen, v); }
+            }
+            if screen == "fatal": Rectangle {
+                background: Theme.win;
+                VerticalLayout {
+                    alignment: center;
+                    padding: 40px;
+                    spacing: 10px;
+                    Text { text: "tgx не может запуститься"; font-size: 22px; font-weight: 600; color: Theme.text; horizontal-alignment: center; }
+                    Text { text: root.fatal-error; wrap: word-wrap; font-size: 14px; color: Theme.muted; horizontal-alignment: center; }
+                }
+            }
+            if screen == "main": HorizontalLayout {
+                Rectangle {
+                    width: 330px;
+                    background: Theme.pane;
+                    VerticalLayout {
+                        Rectangle {
+                            height: 54px;
+                            Text {
+                                x: 16px;
+                                text: "Чаты";
+                                font-size: 18px;
+                                font-weight: 600;
+                                color: Theme.text;
+                            }
+                        }
+                        ScrollView {
+                            VerticalLayout {
+                                for c in root.chats: ChatItem {
+                                    data: c;
+                                    selected: c.key == root.selected-key;
+                                    clicked => {
+                                        root.selected-key = c.key;
+                                        root.open-chat(c.key);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Rectangle { x: parent.width - 1px; width: 1px; background: Theme.line; }
+                }
+                Conversation {
+                    scroll-token: root.scroll-token;
+                    has-chat: root.selected-key != "";
+                    title: root.chat-title;
+                    subtitle: root.chat-subtitle;
+                    ini: root.chat-ini;
+                    ava: root.chat-ava;
+                    saved: root.chat-saved;
+                    group: root.chat-group;
+                    messages: root.messages;
+                    send(t) => { root.send(t); }
+                }
+            }
+        }
+        StatusBar {
+            route: root.route;
+            state: root.conn-state;
+            level: root.conn-level;
+            note: root.route-note;
+        }
+    }
+}
