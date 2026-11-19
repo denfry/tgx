@@ -240,3 +240,50 @@ Not part of MVP. Recorded so the desktop work does not close the door on it.
      must re-dial WSS quickly; the route manager re-probes on a network change.
   4. Notifications without a push server of our own.
 - Minimum Android 8.0 (API 26), the NDK API level the check uses.
+
+## 11. Features taken from AyuGram
+
+AyuGram (AyuGram/AyuGramDesktop, a tdesktop fork) is the reference for what a power
+user expects beyond the official client. It is **GPL-3.0**: we take ideas and
+behaviour, never code, so tgx keeps its own licence choice. Feature list taken from
+its settings (`Telegram/SourceFiles/ayu/ayu_settings.h`) and feature modules, as of
+2026-11-19. Our edge: TDLib does nothing on its own that these features need to
+suppress, so most of them are "don't make the call" rather than patches in a
+protocol layer.
+
+| Feature | How in tgx (TDLib) | Milestone |
+|---|---|---|
+| Ghost mode: no read receipts | don't call `viewMessages` / `openChat` read marking; optional "mark read after I reply" | M3 |
+| Ghost mode: stay offline | option `online = false`; optional offline after each forced online | M3 |
+| Ghost mode: no typing / upload progress | never send `sendChatAction`; verify TDLib sends no upload action itself (not checked) | M3 |
+| Ghost mode: don't mark stories seen | don't call `openStory` (stories are M5 at best) | M3 |
+| Ghost mode per account, quick toggles in drawer and tray, "locked" options | settings model | M3 |
+| Send as scheduled to avoid going online | `messageSchedulingStateSendAtDate` now + a few seconds | M3 |
+| Saved deleted messages (anti-recall) | already captured by the §5.5 store from day one; shown in place with a mark | M3 |
+| Edit history | `updateMessageContent` / `updateMessageEdited` events from the store | M3 |
+| Custom deleted / edited marks (🧹 by default), semi-transparent deleted | UI setting | M3 |
+| Message filters: regex hide, per chat, from the context menu | local filter over view-models, never deletes | M4 |
+| Local "shadow ban": hide a user's messages everywhere | same filter engine, by sender id | M4 |
+| Hide messages from blocked users in groups | `getBlockedMessageSenders` + filter | M4 |
+| Zalgo filter | text normalisation in the view-model | M4 |
+| Streamer mode: window excluded from screen capture, sensitive data hidden | `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)` on the HWND | M3 |
+| Translator | TDLib `translateText` (provider choice later) | M5 |
+| Message shot: render selected messages to an image | render the bubble components offscreen | M4 |
+| Message details (raw JSON), show peer id (Bot API form), seconds in time | developer toggles in settings | M1 |
+| "Messages of this user" in a chat | `searchChatMessages` with `sender_id` | M1 |
+| Repeat message (+1) | forward/copy of the message to the same chat | M1 |
+| Send confirmations for stickers, GIFs, voice, round videos | composer setting | M1 |
+| No sponsored messages, hide stories, hide similar channels | simply never request or render them | MVP (free) |
+| Show only added emoji/stickers, unlimited recent stickers | sticker panel settings | M1 |
+| Customisable composer buttons, drawer items, context-menu items (visible / with Shift / hidden) | layout settings in the theme/UI model | M5 |
+| Appearance: bubble radius, no tails, avatar corners, fonts incl. mono, spoilers revealed, colourful replies on/off, hide premium statuses, hide counters | partly in the theme system (UI spec §2.4); the rest as display settings | M5 |
+| Disable link-open warning, no notification delay | settings | M1 |
+
+Not taken:
+- **Local Telegram Premium.** Server-enforced limits stay; it only fakes UI and invites
+  `api_id` trouble.
+- **Webview spoofing as Android, webview size hacks.** Mini apps are out of scope.
+
+Risk, same as §7: ghost mode and anti-recall are used by known clients but can draw
+`api_id` restrictions; acceptable for personal use, re-assess before any public
+release. Ghost state is always visible in the status bar (UI design §4).
