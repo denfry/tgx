@@ -8,12 +8,12 @@ jobs:
   transport:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: cargo test --locked -p tgx-transport
 
   android-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # ubuntu-latest ships an NDK and exports ANDROID_NDK_LATEST_HOME.
       - run: bash scripts/check-android.sh
