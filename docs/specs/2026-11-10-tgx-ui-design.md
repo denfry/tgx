@@ -23,9 +23,12 @@ the numbers, and which decisions are still open. Interface language is Russian.
    fallbacks: a forced route that fails shows "нет маршрута", not a quiet switch.
 2. **Network facts are set in monospace.** Hosts, latency, DC ids, sizes, logs use
    Cascadia Mono; everything else uses Segoe UI. Data and chrome never look alike.
-3. **Quiet and cheap to draw.** One accent colour, warm greys, no gradients, no blur,
-   no decorative motion, system fonts only. Nothing in the design needs an effect that
-   is expensive in Slint.
+3. **Familiar, then yours.** The default look follows Telegram's conventions (wallpaper
+   with a doodle pattern, saturated outgoing bubble, tails, bright avatars), so nothing
+   feels missing next to the official client. Every colour, the wallpaper, bubble
+   radius, tails and avatar shape are user settings, and a theme travels as a file
+   (§2.4). Still cheap to draw: no blur, no decorative motion, system fonts only;
+   gradients only on the wallpaper and avatars.
 4. **Local things say they are local.** Saved deleted messages, edit history, notes
    and bookmarks exist only on this PC, and each of them states that in place.
 
@@ -33,34 +36,41 @@ the numbers, and which decisions are still open. Interface language is Russian.
 
 ### 2.1 Colour
 
+Defaults are the built-in presets **Дневная** (light) and **Ночная** (dark). Every token
+can be overridden per mode (§2.4).
+
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `win` | `#f7f6f3` | `#1a1b1a` | Main surface: headers, settings window, menus |
-| `pane` | `#efede8` | `#161716` | Chat list, status bar, gaps between settings groups |
-| `rail` | `#e5e2dc` | `#131413` | Folder rail |
-| `chat` | `#f2f0ec` | `#121312` | Conversation background |
-| `in` | `#ffffff` | `#222422` | Incoming bubble, text inputs |
-| `out` | `#e4eceb` | `#33433e` | Outgoing bubble = accent over `in` (13 % light, 22 % dark) |
-| `sel` | `#e2e0da` | `#262826` | Hover and selected row |
-| `line` | `#d9d6cf` | `#2b2d2b` | Borders and dividers, always 1 px |
-| `text` | `#1d1d1b` | `#e6e5e0` | Primary text |
-| `muted` | `#62615c` | `#9b9a94` | Secondary text, timestamps, captions |
-| `faint` | `#88867e` | `#787771` | State icons, placeholders, disabled. Never text |
-| `accent` | `#2f6f62` | `#6fb3a3` | Actions, selected chat, links, own ticks |
-| `accent-ink` | `#ffffff` | `#0e1a17` | Text and icons on accent |
-| `accent-soft` | `#dfe6e2` | `#293633` | Quotes, link previews, reactions = accent over `win` (12 % / 18 %) |
-| `ok` | `#27704a` | `#6cc28b` | Connected |
-| `warn` | `#8a5a0c` | `#e0a64a` | Connecting, direct-route warning |
-| `bad` | `#b5402f` | `#e07a68` | Error, delete, no route |
+| `win` | `#ffffff` | `#17212b` | Headers, composer, settings window, menus |
+| `pane` | `#ffffff` | `#17212b` | Chat list, status bar |
+| `rail` | `#eef1f4` | `#111a22` | Folder rail |
+| `chat` | `#cfdcc4` | `#0e1621` | Conversation background when the wallpaper is a plain colour |
+| `wall` | green-blue gradient | deep blue gradient | Wallpaper under the pattern |
+| `pattern` / `pattern-o` | `#2f5d2a` / 6.5 % | `#8fb4d8` / 4.5 % | Doodle pattern colour and opacity over the wallpaper |
+| `in` | `#ffffff` | `#182533` | Incoming bubble |
+| `out` | `#e2f6d1` | `#2b5278` | Outgoing bubble (its own colour, not derived from the accent) |
+| `in-meta` | `#8b9298` | `#6d7f8f` | Time in incoming bubbles |
+| `out-meta` | `#3f9a45` | `#86b5e0` | Time, ticks, quote bar in outgoing bubbles |
+| `sel` | `#f1f3f5` | `#202c38` | Hover, search field |
+| `sel-on` / `sel-on-ink` | accent / `#ffffff` | `#2b5278` / `#ffffff` | Selected chat row and its text |
+| `line` | `#e4e7ea` | `#0d141b` | Borders and dividers, always 1 px |
+| `text` | `#121417` | `#f2f4f6` | Primary text |
+| `muted` | `#6c7277` | `#7d8e9e` | Secondary text, timestamps, captions |
+| `faint` | `#9aa1a7` | `#5f6f7e` | State icons, placeholders, disabled. Never text |
+| `accent` | `#3a8ee6` | `#5aa9ec` | Actions, links, badges, own unread counters |
+| `accent-ink` | `#ffffff` | `#ffffff` | Text and icons on accent |
+| `accent-soft` | accent over `win`, 12 % | 16 % | Quotes, link previews, reactions |
+| `chip-bg` / `chip-ink` | translucent dark green / white | translucent navy / `#dfe7ee` | Date chips and service messages over the wallpaper |
+| `ok` / `warn` / `bad` | `#2e8a4f` / `#9a6410` / `#d0443a` | `#5cc98a` / `#e5aa4e` / `#ec6f62` | Connected / connecting, direct route / error |
 
-`out` and `accent-soft` are derived, so they change with the accent. Slint has no
-`color-mix`; compute both when the theme or accent changes (linear sRGB mix with the
-percentages above) and expose them as plain colours.
+`accent-soft` is derived. Slint has no `color-mix`, so compute it when the theme or
+accent changes (linear sRGB mix) and expose it as a plain colour.
 
-User-selectable accents (light / dark): teal `#2f6f62` / `#6fb3a3` (default), blue
-`#2d5f9a` / `#7aa7da`, rust `#a4532f` / `#e0916b`, plum `#7a4f7d` / `#c49ac6`, graphite
-`#3d4247` / `#aab2b9`. Avatars without a photo take one of nine muted tones by a hash
-of the name, with white initials.
+Accent swatches (light / dark): blue `#3a8ee6` / `#5aa9ec` (default), teal `#2b8a78` /
+`#5fbfa9`, violet `#7b5cd6` / `#a48cf0`, terracotta `#c2603a` / `#ee9268`, raspberry
+`#c94f86` / `#ec86b4`, graphite `#4a525a` / `#aab2b9`, plus any colour from a picker.
+Avatars without a photo take one of eleven bright top-to-bottom gradients by a hash of
+the name, with white initials.
 
 ### 2.2 Type
 
@@ -107,6 +117,33 @@ call and notification, context menu, lock screen.
 
 Icons: 18 × 18 grid, 1.5 px stroke, round caps and joins, no fill. Drawn at 18 px,
 22 px in the rail. The full set with names is in the design-system view.
+
+### 2.4 Themes and customisation
+
+A theme is presets plus overrides, never a fork of the defaults:
+
+- **Presets per mode.** Light: Дневная, Тёплая (the earlier warm-grey look). Dark:
+  Ночная, Полночь (near-black for OLED), Графит. The OS or the user picks the mode;
+  each mode remembers its own preset.
+- **Overrides.** Any token from §2.1 can be set per mode; unset tokens fall back to
+  the preset. "Все цвета темы" lists every token with a colour picker and a per-token
+  reset. Changes apply live.
+- **Wallpaper per mode:** from the theme, one of four gradients, a plain colour
+  (`chat`), or a user image (cover-fit). Pattern on/off and its opacity 0–20 %.
+- **Shape:** bubble radius 2–22 px (inner corners of a series are a third of it),
+  tails on the last bubble of a series on/off, avatars round or rounded square (30 %),
+  message text 12–18 px.
+- **Theme file** `*.tgx-theme`, JSON:
+  `{"format":"tgx-theme/1","name":…,"light":{"preset":…,"colors":{token:value}},"dark":{…},"shape":{"radius":…,"tails":…,"avaShape":…,"pattern":…}}`.
+  On import, unknown tokens and non-string or over-long values are dropped and an
+  unknown `format` is rejected with a message; a theme file never carries code,
+  URLs or images.
+
+In Slint: one `Theme` global holds every token as a runtime `in-out property`; the
+Rust side resolves preset + overrides + derived colours and writes them on start and
+on every change. Nothing in `.slint` files uses a literal colour. The pattern is one
+tinted tile image (alpha mask coloured by `pattern`), the tail is a small `Path`
+in the bubble colour.
 
 ## 3. Components and their states
 
@@ -212,6 +249,13 @@ gives them as tooltips).
 - Font sizes 12.5 and 13.5 px folded into 13 px.
 - Status bar speed readout now belongs to the download summary and appears only while
   something is downloading.
+- 2026-11-19, owner feedback ("looks worse than Telegram"): moved to a Telegram-like
+  default — blue accent, white list, wallpaper with doodle pattern, green/blue
+  outgoing bubble with its own colour, tails, larger radius, bright gradient avatars,
+  pill search field, opaque date chips over the wallpaper. Added the theme system
+  (§2.4). The old warm-grey palette survives as the Тёплая and Графит presets. The
+  contrast table in §6 still describes the old palette and is to be recomputed from
+  the design-system view.
 
 ## 8. Builder's calls (mine, not owner decisions)
 
