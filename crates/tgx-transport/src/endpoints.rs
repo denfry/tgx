@@ -49,10 +49,18 @@ pub struct WsRoutes {
 }
 
 impl Default for WsRoutes {
+    /// DC 2/4 use the shared web IP (upstream default); DC 1/3/5 use their own
+    /// IPs, which the spike probe and a `pingProxy` through the relay confirmed.
     fn default() -> Self {
         let web = IpAddr::V4(Ipv4Addr::new(149, 154, 167, 220));
         WsRoutes {
-            ip: HashMap::from([(2, web), (4, web)]),
+            ip: HashMap::from([
+                (1, IpAddr::V4(Ipv4Addr::new(149, 154, 175, 50))),
+                (2, web),
+                (3, IpAddr::V4(Ipv4Addr::new(149, 154, 175, 100))),
+                (4, web),
+                (5, IpAddr::V4(Ipv4Addr::new(149, 154, 171, 5))),
+            ]),
         }
     }
 }
@@ -108,15 +116,20 @@ mod tests {
     }
 
     #[test]
-    fn default_routes_only_dc2_dc4() {
+    fn default_routes_cover_all_production_dcs() {
         let r = WsRoutes::default();
-        for dc in [1, 3, 5] {
-            assert_eq!(r.lookup(t(dc, false)), None);
+        let expect = [
+            (1, "149.154.175.50"),
+            (2, "149.154.167.220"),
+            (3, "149.154.175.100"),
+            (4, "149.154.167.220"),
+            (5, "149.154.171.5"),
+        ];
+        for (dc, ip) in expect {
+            let ip: IpAddr = ip.parse().unwrap();
+            assert_eq!(r.lookup(t(dc, false)), Some(ip), "DC{dc}");
+            assert_eq!(r.lookup(t(dc, true)), Some(ip), "DC{dc} media");
         }
-        let ip: IpAddr = "149.154.167.220".parse().unwrap();
-        for dc in [2, 4] {
-            assert_eq!(r.lookup(t(dc, false)), Some(ip));
-            assert_eq!(r.lookup(t(dc, true)), Some(ip));
-        }
+        assert_eq!(r.lookup(t(6, false)), None);
     }
 }
