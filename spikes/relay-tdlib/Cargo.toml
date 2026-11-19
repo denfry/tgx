@@ -3,6 +3,7 @@ name = "relay-tdlib"
 version = "0.1.0"
 edition.workspace = true
 publish.workspace = true
+license.workspace = true
 
 [dependencies]
 rpassword = "7.5.5"

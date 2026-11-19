@@ -11,12 +11,14 @@ fast to develop and light at runtime**. It replaces day-to-day use of Telegram
 Desktop for the owner and becomes the base for custom features (privacy, local
 history, automation) that official clients do not offer.
 
-**Audience and distribution (owner decision, 2026-11-19):** the owner plus family and
-friends. tgx is handed over privately as a zip, never published. It is **purely
-local**: no servers of our own, no accounts of our own, no telemetry or crash
-uploads. Everything the app knows stays on the user's PC; the only network traffic
-is Telegram's (through the chosen route). Users are not technical, so the defaults
-must work on a blocked network with zero setup.
+**Audience and distribution (owner decisions, 2026-11-19):** built for the owner,
+family and friends, and **open source**: the repository is public under GPL-3.0 and
+releases are published on GitHub, so updating is one click for everyone, the owner
+included. The app itself stays **purely local**: no servers of our own, no accounts
+of our own, no telemetry or crash uploads. Everything the app knows stays on the
+user's PC; its only network traffic is Telegram's (through the chosen route) and the
+update check (§12). Users are not technical, so the defaults must work on a blocked
+network with zero setup.
 
 Why not keep forking tdesktop: the owner finds every part of it slow — multi-hour
 dependency builds, long rebuilds, a huge codebase that is slow to change, and poor
@@ -48,8 +50,8 @@ rebuild in seconds.
 Voice/video messages playback, stickers/animated emoji, files other than photos,
 stories, reactions UI, channels admin, bots/inline keyboards beyond plain text,
 calls, notifications beyond a basic Windows toast (toast is optional), multi-account,
-macOS/Linux/mobile (Android is planned after MVP, see §10), installer, auto-update,
-public distribution.
+macOS/Linux/mobile (Android is planned after MVP, see §10), installer. Release
+CI and the updater come right after MVP (§12).
 
 ## 4. Anti-goals (failure even if it "works")
 
@@ -141,11 +143,11 @@ source of truth for display.
 
 - TDLib database and files in `%LOCALAPPDATA%\tgx\` (portable mode is a later option).
 - `api_id`/`api_hash`: owner's own pair from my.telegram.org, supplied at build time
-  via env vars / a git-ignored config, never committed. It is compiled into every
-  copy given to family and friends, so anyone with the exe can extract it (as with
-  every Telegram client). Consequence: if Telegram restricts this `api_id`, every
-  copy stops logging in at once — one more reason privacy features are off by
-  default (§11).
+  via env vars / a git-ignored config, never committed. Release builds get it from a
+  CI secret; people building from source use their own pair. Every published exe
+  contains it and anyone can extract it (as with every Telegram client).
+  Consequence: if Telegram restricts this `api_id`, every release build stops
+  logging in at once — one more reason privacy features are off by default (§11).
 - TDLib `database_encryption_key`: empty in MVP; replaced by passcode-derived key in
   the "client password" roadmap item.
 - Logs: TDLib verbosity low by default; app logs never contain message text, phone
@@ -176,16 +178,13 @@ reminders), **export/backup** (HTML/JSON/Markdown, scheduled).
 **M5 — UI & automation:** themes, compact mode, chat folders/filters, custom hotkeys;
 scripting/plugins, auto-replies, AI features (translate, summarize).
 
-**M6 — heavy:** **calls** (voice/video via tgcalls — largest item), **updates**:
-there is no update server; the owner sends a new zip. Open question for later: an
-opt-in "new version" check against a place the owner controls (e.g. a private
-channel), with signature verification, since copies now live on other people's PCs.
+**M6 — heavy:** **calls** (voice/video via tgcalls — largest item).
 
 **For family and friends (cross-cutting, from M1):** "Скопировать диагностику" in
 settings (versions, active route, recent connection errors; never message text,
 phone numbers or secrets) so the owner can help remotely; a short Russian
-"как запустить" note in the zip, including the Windows SmartScreen warning for an
-unsigned exe; client password moves up in priority because family PCs are shared.
+"как запустить" note in the zip and on the release page, including the Windows
+SmartScreen warning for an unsigned exe; client password moves up in priority because family PCs are shared.
 
 Parked (not selected, may come later): proxy sharing to LAN, portable mode, panic
 button, keyword alerts/anti-spam.
@@ -203,12 +202,11 @@ button, keyword alerts/anti-spam.
 - **Slint maturity** for chat UIs (rich text, selection, large virtual lists with
   variable-height items, image decoding off the UI thread) → validate in the spike.
 - **Licences:** TDLib (BSL-1.0), Slint (GPLv3 / royalty-free / commercial),
-  tg-ws-proxy (MIT, attribution). Handing copies to friends is distribution: the zip
-  carries `LICENSES/` (TDLib, tg-ws-proxy NOTICE, Slint), and the Slint royalty-free
-  licence needs its attribution in the app (an About screen); check the exact
-  wording of the licence version in use before the first copy goes out.
-- **Branding:** copies leave the owner's PC, so the "no Telegram name or logo" rule
-  above applies from the first copy.
+  tg-ws-proxy (MIT, attribution). tgx itself is **GPL-3.0-only** (owner decision),
+  so Slint is used under its GPLv3 option. Release zips carry `LICENSE` and
+  `LICENSES/` (TDLib, tg-ws-proxy NOTICE, Slint); the About screen names them.
+- **Branding:** tgx is public, so the "no Telegram name or logo" rule above applies
+  to the repository, releases and the app.
 
 ## 8. First step (before full plan execution)
 
@@ -312,5 +310,28 @@ Not taken:
 
 Risk, same as §7: ghost mode and anti-recall are used by known clients but can draw
 `api_id` restrictions, and all copies share the owner's `api_id` (§5.6). So every
-privacy feature is **off by default** and each user turns it on for themselves; tgx
-is never published. Ghost state is always visible in the status bar (UI design §4).
+privacy feature is **off by default** and each user turns it on for themselves.
+Ghost state is always visible in the status bar (UI design §4).
+
+## 12. Releases and updates
+
+- **Versioning:** SemVer in the workspace `Cargo.toml`; a release is a `vX.Y.Z` tag on
+  `main`. The tag must match the version or CI fails.
+- **Release CI** (GitHub Actions, `windows-latest`, on tag): tests, release build with
+  `api_id`/`api_hash` from secrets, zip (`tgx.exe`, `tdjson.dll`, `LICENSE`,
+  `LICENSES/`, `README-ru.txt`), a SHA-256 manifest signed with **ed25519**
+  (minisign format), then a GitHub Release with the zip, the manifest and its
+  signature, and notes from the commits since the previous tag. The signing key
+  lives only in a CI secret; its public half is compiled into tgx.
+- **Updater in the app:** checks `releases/latest` of the public repo on start and
+  every 6 hours (off switch in settings). The check and download do not go through
+  the Telegram route (GitHub is not Telegram): they use a plain HTTPS client with
+  system-proxy support and full certificate validation; if GitHub is unreachable the
+  app says so in settings and keeps working. It verifies the signature and hash
+  before touching anything, unpacks next to the current folder, swaps the exe with
+  the rename trick (a running exe can be renamed on Windows), restarts, and keeps the
+  previous version for one rollback. Never downgrades; never installs an unsigned or
+  mismatched file.
+- **Code signing (Authenticode):** none for now, so SmartScreen warns on first run;
+  the release notes explain it. Revisit if the audience grows.
+- Not decided: whether CI also posts release notes to a Telegram channel.

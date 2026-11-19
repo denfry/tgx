@@ -5,6 +5,7 @@ members = ["crates/*", "spikes/*"]
 [workspace.package]
 edition = "2024"
 publish = false
+license = "GPL-3.0-only"
 
 # Dependency debuginfo (tdlib-rs, slint) costs gigabytes and is not needed.
 [profile.dev.package."*"]
