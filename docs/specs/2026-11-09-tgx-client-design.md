@@ -317,21 +317,25 @@ Ghost state is always visible in the status bar (UI design §4).
 
 - **Versioning:** SemVer in the workspace `Cargo.toml`; a release is a `vX.Y.Z` tag on
   `main`. The tag must match the version or CI fails.
-- **Release CI** (GitHub Actions, `windows-latest`, on tag): tests, release build with
-  `api_id`/`api_hash` from secrets, zip (`tgx.exe`, `tdjson.dll`, `LICENSE`,
-  `LICENSES/`, `README-ru.txt`), a SHA-256 manifest signed with **ed25519**
-  (minisign format), then a GitHub Release with the zip, the manifest and its
-  signature, and notes from the commits since the previous tag. The signing key
-  lives only in a CI secret; its public half is compiled into tgx.
-- **Updater in the app:** checks `releases/latest` of the public repo on start and
-  every 6 hours (off switch in settings). The check and download do not go through
-  the Telegram route (GitHub is not Telegram): they use a plain HTTPS client with
-  system-proxy support and full certificate validation; if GitHub is unreachable the
-  app says so in settings and keeps working. It verifies the signature and hash
-  before touching anything, unpacks next to the current folder, swaps the exe with
-  the rename trick (a running exe can be renamed on Windows), restarts, and keeps the
-  previous version for one rollback. Never downgrades; never installs an unsigned or
-  mismatched file.
+- **Release CI** (`.github/workflows/release.yml`, `windows-latest`, on tag): tests,
+  release build with `api_id`/`api_hash` from the `TGX_API_ID` / `TGX_API_HASH`
+  secrets, zip `tgx-X.Y.Z-windows-x64.zip` (`tgx.exe`, `tdjson.dll` with its OpenSSL
+  and zlib DLLs, `LICENSE`, `LICENSES/`, `README-ru.txt`), signed with **minisign**
+  (ed25519, key in the `TGX_MINISIGN_KEY` secret, public half in
+  `packaging/tgx-release.pub` and compiled into tgx). The trusted comment is
+  `tgx X.Y.Z windows-x64`, binding the signature to one version. Then a GitHub
+  Release with the zip, its `.minisig` and generated notes.
+- **Updater in the app** (`crates/tgx/src/updater.rs`): release builds check
+  `releases/latest` 20 s after start and every 6 hours (`TGX_NO_UPDATE=1` turns it off
+  until there is a settings page). Plain HTTPS with full certificate validation,
+  not the Telegram route. A newer release is downloaded (size-capped), its signature
+  and signed version checked, its files unpacked only from the release folder
+  (no path traversal), and swapped in: current files are renamed to `*.old`
+  (allowed for a running exe and its DLLs), new ones moved in, and any failure
+  puts the old files back. The status bar then offers "перезапустить"; `*.old`
+  files are removed on the next start. Never downgrades; unsigned, mis-signed or
+  other-version files are refused. Rollback to the previous version is not built
+  yet.
 - **Code signing (Authenticode):** none for now, so SmartScreen warns on first run;
   the release notes explain it. Revisit if the audience grows.
 - Not decided: whether CI also posts release notes to a Telegram channel.

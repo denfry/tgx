@@ -1,0 +1,76 @@
+name: release
+
+# Push a tag vX.Y.Z on main (matching crates/tgx/Cargo.toml) to publish a release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+env:
+  MINISIGN_URL: https://github.com/jedisct1/minisign/releases/download/0.12/minisign-0.12-win64.zip
+  MINISIGN_SHA256: 37b600344e20c19314b2e82813db2bfdcc408b77b876f7727889dbd46d539479
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check tag matches the app version
+        run: |
+          version=$(grep -m1 '^version' crates/tgx/Cargo.toml | cut -d'"' -f2)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "tag $GITHUB_REF_NAME does not match crates/tgx version $version" >&2
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Test
+        run: cargo test --locked -p tgx-transport -p tgx
+
+      - name: Build
+        env:
+          TGX_API_ID: ${{ secrets.TGX_API_ID }}
+          TGX_API_HASH: ${{ secrets.TGX_API_HASH }}
+        run: |
+          if [ -z "$TGX_API_ID" ] || [ -z "$TGX_API_HASH" ]; then
+            echo "TGX_API_ID / TGX_API_HASH secrets are not set" >&2
+            exit 1
+          fi
+          cargo build --locked --release -p tgx
+
+      - name: Package
+        run: |
+          name="tgx-$VERSION-windows-x64"
+          mkdir -p "dist/$name/LICENSES"
+          cp target/release/tgx.exe "dist/$name/"
+          cp target/release/build/tgx-*/out/tdlib/bin/*.dll "dist/$name/"
+          cp LICENSE packaging/README-ru.txt "dist/$name/"
+          cp packaging/LICENSES/* "dist/$name/LICENSES/"
+          (cd dist && 7z a -tzip -mx=9 "$name.zip" "$name" > /dev/null)
+          echo "ZIP=dist/$name.zip" >> "$GITHUB_ENV"
+
+      - name: Sign
+        env:
+          MINISIGN_KEY: ${{ secrets.TGX_MINISIGN_KEY }}
+        run: |
+          curl -sSfL -o minisign.zip "$MINISIGN_URL"
+          echo "$MINISIGN_SHA256  minisign.zip" | sha256sum -c -
+          7z x -ominisign minisign.zip > /dev/null
+          printf '%s\n' "$MINISIGN_KEY" > "$RUNNER_TEMP/tgx.key"
+          ./minisign/minisign-win64/x86_64/minisign.exe -S -s "$RUNNER_TEMP/tgx.key" -m "$ZIP" \
+            -t "tgx $VERSION windows-x64"
+          rm -f "$RUNNER_TEMP/tgx.key"
+          ./minisign/minisign-win64/x86_64/minisign.exe -V -P "$(sed -n 2p packaging/tgx-release.pub)" -m "$ZIP"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "$ZIP" "$ZIP.minisig" \
+            --title "tgx $VERSION" --generate-notes --verify-tag

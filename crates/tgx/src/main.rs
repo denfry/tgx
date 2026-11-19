@@ -3,6 +3,7 @@
 
 mod core;
 mod model;
+mod updater;
 
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -55,6 +56,15 @@ fn main() -> Result<(), slint::PlatformError> {
             let _ = tx.send(Cmd::Send(text.into()));
         });
     }
+
+    app.on_restart_for_update(|| {
+        if let Err(e) = updater::restart() {
+            eprintln!("restart after update: {e}");
+            return;
+        }
+        let _ = slint::quit_event_loop();
+    });
+    start_updater(&app);
 
     app.run()?;
 
@@ -119,6 +129,50 @@ fn start_core(app: &AppWindow, cfg: Config, rx: mpsc::UnboundedReceiver<Cmd>) {
             rt.block_on(core::run(cfg, rx, sink));
         })
         .expect("spawn core thread");
+}
+
+const UPDATE_FIRST_CHECK: Duration = Duration::from_secs(20);
+const UPDATE_EVERY: Duration = Duration::from_secs(6 * 60 * 60);
+
+/// Checks GitHub Releases in the background and installs a newer signed
+/// release; the user restarts from the status bar. Release builds only;
+/// `TGX_NO_UPDATE=1` turns it off.
+fn start_updater(app: &AppWindow) {
+    if cfg!(debug_assertions) || std::env::var_os("TGX_NO_UPDATE").is_some() {
+        return;
+    }
+    if let Ok(dir) = updater::install_dir() {
+        updater::cleanup_old(&dir);
+    }
+    let weak = app.as_weak();
+    let note = move |text: String| {
+        let _ = weak.upgrade_in_event_loop(move |app| app.set_update_note(text.into()));
+    };
+    let _ = std::thread::Builder::new()
+        .name("tgx-updater".into())
+        .spawn(move || {
+            std::thread::sleep(UPDATE_FIRST_CHECK);
+            loop {
+                match updater::check() {
+                    Ok(Some(a)) => {
+                        note(format!("загрузка обновления {}…", a.version));
+                        match updater::install(&a) {
+                            Ok(()) => {
+                                note(format!("обновление {} готово · перезапустить", a.version));
+                                return;
+                            }
+                            Err(e) => {
+                                eprintln!("update {}: {e}", a.version);
+                                note(String::new());
+                            }
+                        }
+                    }
+                    Ok(None) => {}
+                    Err(e) => eprintln!("update check: {e}"),
+                }
+                std::thread::sleep(UPDATE_EVERY);
+            }
+        });
 }
 
 fn apply(app: &AppWindow, msg: UiMsg) {

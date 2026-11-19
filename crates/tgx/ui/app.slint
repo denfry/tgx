@@ -103,6 +103,8 @@ component StatusBar inherits Rectangle {
     in property <string> state;
     in property <int> level;
     in property <string> note;
+    in property <string> update;
+    callback update-clicked();
     height: 26px;
     background: Theme.pane;
     Rectangle { y: 0; height: 1px; background: Theme.line; }
@@ -123,6 +125,21 @@ component StatusBar inherits Rectangle {
         Text { text: state; color: Theme.text; font-size: 12px; font-family: Theme.mono; vertical-alignment: center; }
         Text { text: route; color: Theme.muted; font-size: 12px; font-family: Theme.mono; vertical-alignment: center; }
         Text { text: note; color: Theme.warn; font-size: 12px; font-family: Theme.mono; vertical-alignment: center; }
+    }
+    if update != "": Rectangle {
+        x: parent.width - self.width - 12px;
+        width: upd.preferred-width;
+        upd := Text {
+            text: update;
+            color: upd-ta.has-hover ? Theme.accent.darker(10%) : Theme.accent;
+            font-size: 12px;
+            font-family: Theme.mono;
+            vertical-alignment: center;
+        }
+        upd-ta := TouchArea {
+            mouse-cursor: pointer;
+            clicked => { root.update-clicked(); }
+        }
     }
 }
 
@@ -550,6 +567,9 @@ export component AppWindow inherits Window {
     in property <int> conn-level: 1;
     in property <string> route: "WS";
     in property <string> route-note;
+    // "обновление 0.2.0 готово · перезапустить" when an update is installed.
+    in property <string> update-note;
+    callback restart-for-update();
 
     callback submit-login(string, string);
     callback open-chat(string);
@@ -627,6 +647,8 @@ export component AppWindow inherits Window {
             state: root.conn-state;
             level: root.conn-level;
             note: root.route-note;
+            update: root.update-note;
+            update-clicked => { root.restart-for-update(); }
         }
     }
 }
