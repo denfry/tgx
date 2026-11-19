@@ -40,7 +40,8 @@ rebuild in seconds.
 Voice/video messages playback, stickers/animated emoji, files other than photos,
 stories, reactions UI, channels admin, bots/inline keyboards beyond plain text,
 calls, notifications beyond a basic Windows toast (toast is optional), multi-account,
-macOS/Linux/mobile, installer, auto-update, public distribution.
+macOS/Linux/mobile (Android is planned after MVP, see §10), installer, auto-update,
+public distribution.
 
 ## 4. Anti-goals (failure even if it "works")
 
@@ -212,3 +213,30 @@ Crate/module layout, choice between `tokio-tungstenite` and alternatives, view-m
 design, image decoding/caching approach, testing strategy details (relay handshake
 parsing must have unit tests with known vectors; route chain logic must be testable
 without network), CI setup.
+
+## 10. Android (after MVP)
+
+Not part of MVP. Recorded so the desktop work does not close the door on it.
+
+- **Same transport, in process.** The WS relay runs inside the app, as on Windows:
+  TDLib connects to `127.0.0.1:<random port>` with `proxyTypeMtproto`. Unlike
+  standalone Android proxies such as valnesfjord/tg-ws-proxy-rs (a separate app with a
+  foreground service and a `tg://proxy` link for the official client), there is no
+  second app, no proxy to add by hand, and no service of its own for the system to
+  kill: the relay lives and dies with the client process.
+- **Kept portable now.** `tgx-transport` has no platform code (tokio, rustls with
+  `ring`, tokio-tungstenite). `scripts/check-android.sh` type-checks it for
+  `aarch64-linux-android`, `armv7-linux-androideabi` and `x86_64-linux-android` with
+  the NDK clang (needed by `ring`); CI runs it. New platform-neutral crates (TDLib
+  session, route manager, message store) are added to that script, and Windows-only
+  code stays in the app crate.
+- **Open work, in order of cost:**
+  1. TDLib for Android. `tdlib-rs` prebuilt TDLib covers desktop only, so TDLib is
+     built with the NDK per ABI (not verified yet).
+  2. A phone UI: stack navigation, gestures, soft keyboard, safe areas. The tokens in
+     the UI design carry over; the desktop layout does not. Slint's Android backend is
+     the first candidate, to be checked against the same list benchmark as the spike.
+  3. Lifecycle: Doze and process death, and network changes (Wi-Fi ↔ mobile) that
+     must re-dial WSS quickly; the route manager re-probes on a network change.
+  4. Notifications without a push server of our own.
+- Minimum Android 8.0 (API 26), the NDK API level the check uses.
