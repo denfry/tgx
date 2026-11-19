@@ -5,11 +5,18 @@ UI design: [`2026-11-10-tgx-ui-design.md`](2026-11-10-tgx-ui-design.md), prototy
 
 ## 1. Intent
 
-A personal Telegram desktop client for Windows that **just works where Telegram is
+A Telegram desktop client for Windows that **just works where Telegram is
 throttled or blocked**, without a separate proxy app, and that is **fast to build,
 fast to develop and light at runtime**. It replaces day-to-day use of Telegram
 Desktop for the owner and becomes the base for custom features (privacy, local
 history, automation) that official clients do not offer.
+
+**Audience and distribution (owner decision, 2026-11-19):** the owner plus family and
+friends. tgx is handed over privately as a zip, never published. It is **purely
+local**: no servers of our own, no accounts of our own, no telemetry or crash
+uploads. Everything the app knows stays on the user's PC; the only network traffic
+is Telegram's (through the chosen route). Users are not technical, so the defaults
+must work on a blocked network with zero setup.
 
 Why not keep forking tdesktop: the owner finds every part of it slow — multi-hour
 dependency builds, long rebuilds, a huge codebase that is slow to change, and poor
@@ -19,7 +26,8 @@ sync; this project owns only UI, networking transport and custom features.
 
 ## 2. Goals (MVP)
 
-1. Windows 10/11 x64, single `tgx.exe` + `tdjson.dll` (plus Slint runtime deps if any).
+1. Windows 10/11 x64, a portable zip: `tgx.exe` + `tdjson.dll` + `LICENSES/`. Runs
+   from any folder without installation or admin rights.
 2. Login: phone → code → 2FA password; QR login is a nice-to-have.
 3. Chat list (virtualized, unread counters, last message preview, avatars).
 4. Chat view (virtualized history, infinite scroll up), send/receive **text and photos**,
@@ -104,8 +112,8 @@ Modelled on Flowseal/tg-ws-proxy (MIT, Python) — port the logic, keep attribut
 
 ### 5.4 Connection chain (auto mode)
 
-Order (owner decision): **WS → user-provided MTProxy/SOCKS5 → (later) own CDN relay
-→ direct only if explicitly enabled in settings** (default off). Rationale: the network
+Order (owner decision): **WS → user-provided MTProxy/SOCKS5 → (later) user-provided
+WS relay → direct only if explicitly enabled in settings** (default off). Rationale: the network
 observer should not see direct connections to Telegram IPs in auto mode either.
 The core probes routes (TDLib `pingProxy` / `testNetwork` + connection-state updates),
 switches on sustained failure, remembers the last good route per network, and
@@ -133,7 +141,11 @@ source of truth for display.
 
 - TDLib database and files in `%LOCALAPPDATA%\tgx\` (portable mode is a later option).
 - `api_id`/`api_hash`: owner's own pair from my.telegram.org, supplied at build time
-  via env vars / a git-ignored config, never committed.
+  via env vars / a git-ignored config, never committed. It is compiled into every
+  copy given to family and friends, so anyone with the exe can extract it (as with
+  every Telegram client). Consequence: if Telegram restricts this `api_id`, every
+  copy stops logging in at once — one more reason privacy features are off by
+  default (§11).
 - TDLib `database_encryption_key`: empty in MVP; replaced by passcode-derived key in
   the "client password" roadmap item.
 - Logs: TDLib verbosity low by default; app logs never contain message text, phone
@@ -147,8 +159,9 @@ manager** (queue, parallel large downloads, per-chat auto-download rules and fol
 **resource saver** (tray mode with minimal RAM, cache size limits, animations off).
 
 **M2 — network:** **network diagnostics** panel (per-DC latency, active route, speed,
-switch log); **own WS relay on a CDN** (Cloudflare Worker / own VPS) as the next link
-in the chain if Telegram's WS endpoints get blocked; **DoH and anti-DPI** (DNS over
+switch log); **user-provided WS relay** (a Cloudflare Worker or VPS address the user
+enters, like a custom proxy) as the next link in the chain if Telegram's WS endpoints
+get blocked — tgx ships no relay of its own; **DoH and anti-DPI** (DNS over
 HTTPS for WS hosts, TLS ClientHello fragmentation, configurable SNI).
 
 **M3 — privacy & accounts:** **ghost mode** (don't send read receipts / online /
@@ -163,8 +176,16 @@ reminders), **export/backup** (HTML/JSON/Markdown, scheduled).
 **M5 — UI & automation:** themes, compact mode, chat folders/filters, custom hotkeys;
 scripting/plugins, auto-replies, AI features (translate, summarize).
 
-**M6 — heavy:** **calls** (voice/video via tgcalls — largest item), **auto-update**
-(GitHub Releases with signature verification, needed once distributed).
+**M6 — heavy:** **calls** (voice/video via tgcalls — largest item), **updates**:
+there is no update server; the owner sends a new zip. Open question for later: an
+opt-in "new version" check against a place the owner controls (e.g. a private
+channel), with signature verification, since copies now live on other people's PCs.
+
+**For family and friends (cross-cutting, from M1):** "Скопировать диагностику" in
+settings (versions, active route, recent connection errors; never message text,
+phone numbers or secrets) so the owner can help remotely; a short Russian
+"как запустить" note in the zip, including the Windows SmartScreen warning for an
+unsigned exe; client password moves up in priority because family PCs are shared.
 
 Parked (not selected, may come later): proxy sharing to LAN, portable mode, panic
 button, keyword alerts/anti-spam.
@@ -182,7 +203,12 @@ button, keyword alerts/anti-spam.
 - **Slint maturity** for chat UIs (rich text, selection, large virtual lists with
   variable-height items, image decoding off the UI thread) → validate in the spike.
 - **Licences:** TDLib (BSL-1.0), Slint (GPLv3 / royalty-free / commercial),
-  tg-ws-proxy (MIT, attribution).
+  tg-ws-proxy (MIT, attribution). Handing copies to friends is distribution: the zip
+  carries `LICENSES/` (TDLib, tg-ws-proxy NOTICE, Slint), and the Slint royalty-free
+  licence needs its attribution in the app (an About screen); check the exact
+  wording of the licence version in use before the first copy goes out.
+- **Branding:** copies leave the owner's PC, so the "no Telegram name or logo" rule
+  above applies from the first copy.
 
 ## 8. First step (before full plan execution)
 
@@ -285,5 +311,6 @@ Not taken:
 - **Webview spoofing as Android, webview size hacks.** Mini apps are out of scope.
 
 Risk, same as §7: ghost mode and anti-recall are used by known clients but can draw
-`api_id` restrictions; acceptable for personal use, re-assess before any public
-release. Ghost state is always visible in the status bar (UI design §4).
+`api_id` restrictions, and all copies share the owner's `api_id` (§5.6). So every
+privacy feature is **off by default** and each user turns it on for themselves; tgx
+is never published. Ghost state is always visible in the status bar (UI design §4).
